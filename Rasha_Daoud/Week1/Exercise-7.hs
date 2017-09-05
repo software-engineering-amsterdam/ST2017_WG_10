@@ -65,18 +65,42 @@ isVisa n =            elem (length (int2ListInt n)) [13,16,19]
 
 {-------------------------------------------------------------------------------------------------------------------------}
 
-{- To test the implemenation, we need to design a kind of random generator for numbers
-    first, it would be good to test whether we pass a valid credit-card number, and the result is validation is as expected.
+{- To verify if our implementation is correct,
+   it would be good to test whether we pass a valid credit-card number, and the result of our validator is as expected.
 	and if we pass invalid card-number, the function should return false
  -}
-{- still TODO --}
 
--- then we implement a simple generator
-generatorNrs :: Int -> Int -> [Integer]
-generatorNrs 0 _ = []
-generatorNrs n seed = take n . randomRs (0, 9) . mkStdGen $ seed -- n is the length we need
+-- Consider the list of pairs, first element is the card-number and the second element is the validator expected result
+americanEValidity :: [(Integer, Bool)]
+americanEValidity = [
+                             (342238480772410, True),
+                             (343186419945624, True),
+                             (379773487441912, True),
+                             (5246644310785941, False)
+                           ]
 
--- Get the sum of all digits returned from the generator (to test against Luhn or other customized validators)
-getSumOnGeneratedNr :: [Integer] -> Integer
-getSumOnGeneratedNr ns = (sum.doubleNext) ns 
+{- numbers in the previous list are taken from https://www.freeformatter.com/credit-card-number-generator-validator.html -}
 
+
+-- we can test any of our validators against a defined list we fill it with a number and the expected result of the validation
+testValidity :: (Integer -> Bool) -> [(Integer, Bool)] -> Bool
+testValidity f l = and [f n == v  | (n,v) <- l]
+-- the function f can be isMaster, isVisa, isAmericanExpress or simple luhn
+-- the list l can be americanEValidity or any list of card numbers (integers)
+
+{- GHCi:
+         *Exercise7> testValidity isAmericanExpress americanEValidity
+          True
+-}
+
+{-
+  basically we can define any list rather than americanEValidity and call testValidity on the relevant validator and the list
+  (Visa card & Master card)
+-}
+
+
+{- we can also implement a generator using System.Random to produce seeds, to fill the list which we will apply testValidity on.
+   e.g implement a generator of american express card numbers (following our specifications).
+   but that might not make sense, because the generator will follow same specifications as the validator of the relevant type of cards.
+   therefore I find prove by example more sufficient.
+-}
