@@ -11,10 +11,13 @@ int2ListInt n | (n<10) = [n]
               | otherwise = int2ListInt (div n 10) ++ [mod n 10] 
 
 -- second, we need a function to double the next digit in the list (weights of product are: 1 2 1 2 1 2 ... etc ..)
+-- add up digits of doubled numbers that are > 10 -----break them into their digits and sum the digits
 doubleNext :: [Integer] -> [Integer]
 doubleNext [] = []
 doubleNext [x] = [x]
-doubleNext (n:m:xs) = n: (2*m): doubleNext xs
+doubleNext (n:m:xs) = if (2*m <10)
+                        then (n: (2*m): doubleNext xs )
+                      else (n: (sum(int2ListInt (2*m)): doubleNext xs )) -- sum digits of the the doubled every other 
 
 -- Luhn function, verifies if an integer satisfies the algorithm
 luhn :: Integer -> Bool
@@ -72,7 +75,7 @@ isVisa n =            elem (length (int2ListInt n)) [13,16,19]
 generatorNrs :: Int -> Int -> [Integer]
 generatorNrs 0 _ = []
 generatorNrs n seed = take n . randomRs (0, 9) . mkStdGen $ seed -- n is the length we need
-		  
+
 -- Get the sum of all digits returned from the generator (to test against Luhn or other customized validators)
 getSumOnGeneratedNr :: [Integer] -> Integer
 getSumOnGeneratedNr ns = (sum.doubleNext) ns 
