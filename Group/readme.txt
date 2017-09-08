@@ -1,1 +1,0 @@
-Here we will place best solutions with a summary.
