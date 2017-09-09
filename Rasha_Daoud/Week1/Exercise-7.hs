@@ -22,14 +22,14 @@ doubleNext (n:m:xs) = if (2*m <10)
 -- Luhn function, verifies if an integer satisfies the algorithm
 luhn :: Integer -> Bool
 luhn n =  mod (sum (doubleNext (int2ListInt n))) 10 == 0
--- GHCi:  luhn 24 = True - > 2*1 + 4 * 2 = 10  correct
+
 
 
 {-------------------------------------------------------------------------------------------------------------------------}
 
 -- Verify if a number starts with another number
 isStartingBy :: Integer -> Integer -> Bool
-isStartingBy n m = or [xx == yy | (xx,yy)<- zip (int2ListInt n) (int2ListInt m)]
+isStartingBy n m = and [xx == yy | (xx,yy)<- zip (int2ListInt n) (int2ListInt m)]
 
 -- Second step, use previous function to check whether a number starts with a list of other numbers (options)
 isStartingByOptions :: Integer -> [Integer] -> Bool
