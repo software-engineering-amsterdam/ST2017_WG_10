@@ -21,7 +21,9 @@ refuteFact = filter (not.prime) (map prodCalc [2..])
 {- To test it in GHCi, type refuteFact
     it will return non empty list. Then we've proven that the fact is false.
 	
-	-What is the smallest counterExample?
-	it is: 30031
     result is [30031,510511,9699691,223092871,6469693231 ... ..... .....]
+	-What is the smallest counterExample?
+	head refuteFact
+	30031
+	
 -}
