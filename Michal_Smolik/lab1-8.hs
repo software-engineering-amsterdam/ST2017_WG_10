@@ -58,7 +58,7 @@ count_false = foldl (\i v -> if not v then i + 1 else i) 0
 guilty :: [Boy]
 guilty = filter (\b -> count_false(eval b) == 2) boys
 
---for each guilty boy finds liars in that instance (list of lists, in case there are multiple solutions)
-liars :: [[Boy]]
-liars = map (\g -> (filter (\b -> not (statement_true b g)) boys)) guilty
+--for each guilty boy finds honest boys in that instance (list of lists, in case there are multiple solutions)
+honest :: [[Boy]]
+honest = map (\g -> (filter (\b -> (statement_true b g)) boys)) guilty
 --1.5h
