@@ -29,7 +29,7 @@ Idea of this implementation is to evaluate each statement, if it is true, based 
 First, we declare the boys' statements in statement_true(who_said_it, suspect_boy). That will return true, if their
 statement is true. Then, we evaluate the statements for each suspect boy. If there are exactly two false statements,
 the boy is guilty, because every condition is satisfied. Otherwise, he is not guilty.
-Then, we find liars for each possibly guilty boy by filtering through their statements.
+Then, we find honest boys for each possibly guilty boy by filtering through their statements.
 -}
 --statement_true(who_said_it, suspect_boy) 
 statement_true :: Boy -> Boy -> Bool
