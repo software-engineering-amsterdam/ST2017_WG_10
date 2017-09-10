@@ -4,9 +4,9 @@ import Test.QuickCheck
 
 prime :: Integer -> Bool
 prime n = n > 1 && all (\ x -> rem n x /= 0) xs
-  where xs = takeWhile (\ y -> y^2 <= n) primes
-primes :: [Integer]
-primes = 2 : filter prime [3..] 
+  where xs = takeWhile (\ y -> y^2 <= n) primes_till_10000
+primes_till_10000 :: [Integer]
+primes_till_10000 = 2 : filter prime [3..10000] 
 
 
 --I call the primes, for which their reversal is also prime, reversable.
@@ -18,10 +18,8 @@ isReversePrime :: Integer -> Bool
 isReversePrime n = prime n && prime (reversal n)
 
 reversablePrimes :: [Integer]
-reversablePrimes = filter isReversePrime primes
+reversablePrimes = filter isReversePrime primes_till_10000
 
-first_10000_reversable_primes :: [Integer]
-first_10000_reversable_primes = take 10000 reversablePrimes
 {-
 testing the reversal could be done with another implementation of the same function, like arithmetically:
 -}
