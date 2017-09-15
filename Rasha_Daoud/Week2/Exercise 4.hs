@@ -26,3 +26,5 @@ isCommutative xs ys = sort xs == sort ys
 isAssosiative :: Eq a => Num a => [a] -> [a] -> Bool
 isAssosiative xs ys = sum xs == sum ys
 
+HasSameLength : Ord a => [a] -> [a] -> Bool
+HasSameLength xs ys = length xs == length ys
