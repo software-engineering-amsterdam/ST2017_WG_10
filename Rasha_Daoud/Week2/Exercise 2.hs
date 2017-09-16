@@ -95,14 +95,17 @@ testRectangular = length (filter (==Rectangular) [ triangle x 4 3 | x <- [1..100
 -- in this case, the count of other should be: 
 -- the sum of all generated shapes - the sum of all recognized shapes in previous tests
 otherCount :: Int
-otherCount = length[triangle x y z | x <- [1..100], y <- [1..100], z <- [1..100]]
+otherCount = length[triangle x y z | x <- [0..100], y <- [1..100], z <- [1..100]]
           - length (filter (==NoTriangle) [triangle 0 y z | y <- [1..100], z <- [1..100]])
 		  - length (filter (==Equilateral) [triangle x y z | x <- [1..100], y <- [1..100], z <- [1..100]])
 		  - length (filter (==Rectangular) [ triangle x 4 3 | x <- [1..100]])
 		  - length (filter (==Isosceles) [triangle 100 100 z |  z <- [1..99]])
 
 testOther :: Bool
-testOther =  length (filter (==Other) [triangle x y z | x <- [1..100], y <- [1..100], z <- [1..100]]) == otherCount
+testOther =   (length [triangle x y z | x <- [1..100], y <- [1..100], z <- [1..100]]
+              -
+			  length (filter (==Other) [triangle x y z | x <- [1..100], y <- [1..100], z <- [1..100]]))
+			  == otherCount
 --1^2 + 3^2 = 10 (5^2)
 {- GHCi:
    *Exercise2> testNoTriangle
@@ -113,4 +116,17 @@ testOther =  length (filter (==Other) [triangle x y z | x <- [1..100], y <- [1..
    True
    *Exercise2> testRectangular
    True
+-}
+
+main = do
+	print testNoTriangle
+	print testEquilateral
+	print testIsosceles
+	print testRectangular
+
+{- *Exercise2> main
+	True
+	True
+	True
+	True
 -}
