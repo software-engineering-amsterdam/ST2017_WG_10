@@ -33,44 +33,51 @@ probs n = do
 withinRange :: Float -> Float -> [Float] -> Bool
 withinRange min max xs = and [x >min && x <max| x <- xs]
 
+{- Let us allow for a mean error of 100 in the evenly distribution
+(because among the 10000, the distribution is roughl 2500 in each of the given range) -}
+mean :: Int
+mean = 100
 
-quartL :: [Float] -> Float
-quartL xs = fromIntegral(length xs) / 4
-
--- Second, check the resulting list has any duplicates
-hasDuplicates :: [Float] -> Bool
-hasDuplicates []  = False
-hasDuplicates [_] = False
-hasDuplicates (x:xs) | elem x xs = True
-                     | otherwise = hasDuplicates xs
-
--- Let us allow for a mean of 0.05 (because among the 10000, the distribution is roughl 2500 in each of the given range)
-mean :: Float
-mean = 0.05
-
-calculateFreq :: Float -> Float -> [Float] -> Float
-calculateFreq min max xs = fromIntegral (length (filter (>min) (filter (<=max) xs))) / fromIntegral (length xs)
-
--- Then, we need a function to check whether the distribution of numbers is roughly equal (accept 0.05)
+-- Then, we need a function (property) to check whether the distribution of numbers is roughly equal (accept mean error)
 {- my post conditions -}
-isDistributedEvenly :: [Float] -> Bool
-isDistributedEvenly xs =
-                          withinRange 0.0 1.0 xs
-                        --  && not(hasDuplicates xs)
-						  && (calculateFreq 0.0 0.25 xs)  == quartL xs + mean
-						  && (calculateFreq 0.25 0.5 xs)  == quartL xs + mean
-						  && (calculateFreq 0.5 0.75 xs)  == quartL xs + mean
-						  && (calculateFreq 0.75 1.0 xs)  == quartL xs + mean
+isDistributedEvenly :: [Float] -> IO Bool
+isDistributedEvenly xs = do
+							m <- getDistribution
+							if (withinRange 0.0 1.0 xs)
+							&&  (abs ((m !! 0) - (m !! 1)) <= mean)
+							&&  (abs ((m !! 1) - (m !! 2)) <= mean)
+						    &&  (abs ((m !! 2) - (m !! 3)) <= mean)
+							then return True
+						    else return False
+						     
+{--------------------------------------------Testing---------------------------------------------------------}
+-- we need a function to return the distribution (four quarters)
+getDistribution :: IO [Int]
+getDistribution = do
+					  a <- probs 10000
+					  let p1 = length (filter (< 0.25) a)
+					  let p2 = length (filter (\b -> (b < 0.5)&&(b >= 0.25)) a)
+					  let p3 = length (filter (\b -> (b < 0.75)&&(b >= 0.5)) a)
+					  let p4 = length (filter (>= 0.75) a)
+					  return (p1:p2:p3:p4:[])
+
+main = do
+ getDistribution
+
+{- GHCi:
+       *Exercise1> main
+       [2462,2470,2560,2508]
+-}
 
 testIter :: Int -> Int -> ([Float] -> Bool) -> IO ()
 testIter k n r = if k == n then print (show n ++ " tests passed")
                 else do
-                  xs <- probs 10000
+                  xs <- probs 10000 -- test the programmer's function with 10000 generated numbers
                   if r xs then
-                    do print ("pass one test")
+                    do print ("pass one test on:" ++ show k)
                        testIter (k+1) n r
                   else error ("failed test on:" ++ show k)
 
 testProbs :: ([Float] -> Bool) -> IO ()
 testProbs p = testIter 1 100 p
--- testProbs isDistributedEvenly
+-- GHCi: testProbs isDistributedEvenly
