@@ -6,13 +6,16 @@ import System.Random
 import Test.QuickCheck
 
 -- 20 min
-rot13 :: Eq a => [a] -> [a]
-rot13 xs = rotN xs 13
+rot13 :: [Char] -> [Char]
+rot13 s = rotString s 13
 
-rotN :: Eq a => [a] -> Int -> [a]
-rotN xs n | (n == 1)  = rot xs
-          | (n > 1)   = rot (rotN xs (n-1))
-          | otherwise = xs
+rotString :: [Char] -> Int -> [Char]
+rotString s n = [rotChar c n | c <- s]
 
-rot :: Eq a => [a] -> [a]
-rot xs = tail xs ++ [head xs]
+rotChar :: Char -> Int -> Char
+rotChar c n | (between (ord c) 65 90)   = chr (65 + (mod ((n + (ord c)) - 65) 26))
+            | (between (ord c) 97 122)  = chr (97 + (mod ((n + (ord c)) - 97) 26))
+            | otherwise = c
+            
+between :: Int -> Int -> Int -> Bool
+between n x y = if (x <= n && n <= y) then True else False
