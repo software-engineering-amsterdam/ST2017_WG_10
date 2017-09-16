@@ -18,8 +18,7 @@ fib n = fib (n-1) + fib (n-2)
 
 generateFibList :: [Int]
 generateFibList = 1 : 1 : zipWith (+) generateFibList (drop 1 generateFibList)
-{- *Problem2> generateFibList 4000000
--}
+
 
 sumEvenFib :: Int -> Int
 sumEvenFib n = sum $ filter even (takeWhile (<n) generateFibList)
