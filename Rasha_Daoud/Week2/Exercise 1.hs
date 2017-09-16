@@ -40,16 +40,26 @@ mean = 100
 
 -- Then, we need a function (property) to check whether the distribution of numbers is roughly equal (accept mean error)
 {- my post conditions -}
-isDistributedEvenly :: [Float] -> IO Bool
+isDistributedEvenly :: IO [Float] -> IO Bool
 isDistributedEvenly xs = do
 							m <- getDistribution
-							if (withinRange 0.0 1.0 xs)
-							&&  (abs ((m !! 0) - (m !! 1)) <= mean)
-							&&  (abs ((m !! 1) - (m !! 2)) <= mean)
-						    &&  (abs ((m !! 2) - (m !! 3)) <= mean)
-							then return True
-						    else return False
-						     
+							let m1 = m !! 0
+							let m2 = m !! 1
+							let m3 = m !! 2
+							let m4 = m !! 3
+							if ({-withinRange 0.0 1.0 xs) && -}(abs (m1-m2) <= mean)&& (abs (m2-m3) <= mean) && (abs (m3-m4) <= mean)) then return True else return False
+{- GHCi:
+	*Exercise1> isDistributedEvenly (probs 100000)
+	True
+	*Exercise1> isDistributedEvenly (probs 100000)
+	True
+	*Exercise1> isDistributedEvenly (probs 100000)
+	True
+	*Exercise1> isDistributedEvenly (probs 100000)
+	False
+	*Exercise1> isDistributedEvenly (probs 100000)
+	True
+-}			     
 {--------------------------------------------Testing---------------------------------------------------------}
 -- we need a function to return the distribution (four quarters)
 getDistribution :: IO [Int]
@@ -69,6 +79,7 @@ main = do
        [2462,2470,2560,2508]
 -}
 
+{- Now we can write automate 100 tests on probs 10000 call using any property p (e.g. isDistributedEvenly) -}
 testIter :: Int -> Int -> ([Float] -> Bool) -> IO ()
 testIter k n r = if k == n then print (show n ++ " tests passed")
                 else do
@@ -80,4 +91,3 @@ testIter k n r = if k == n then print (show n ++ " tests passed")
 
 testProbs :: ([Float] -> Bool) -> IO ()
 testProbs p = testIter 1 100 p
--- GHCi: testProbs isDistributedEvenly
