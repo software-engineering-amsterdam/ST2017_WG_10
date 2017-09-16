@@ -1,4 +1,4 @@
---Testing properties strength- time: 30 mins
+--Testing properties strength- time: 40 mins
 module Exercise3 where
 
 import Data.List
@@ -71,3 +71,7 @@ strengthList = quicksortProbs range [0..3] -- result is [0,3,1,2]
 	*Exercise3> strengthList
 	[0,3,1,2]
 -}
+
+main = do
+	print "prop0, prop1, prop2, prop3"
+	print strengthList
