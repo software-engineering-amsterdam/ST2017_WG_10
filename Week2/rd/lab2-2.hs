@@ -125,7 +125,7 @@ main = do
 
    Instead of implementing only one function for the triangle check, I preferred to implement each property aside & call all properties in the triangle function, to determine the type of the shape.
    
-   After that I used a list generator to generate values for the three sides. Following the specifications of triangle & its special types on wikipedia. I could right some testable properties following properties used in the implementation of triangle function.
+   After that I used a list generator to generate values for the three sides. Following the specifications of triangle & its special types on wikipedia. I could write some testable properties following properties used in the implementation of triangle function.
 
 	Results: 
 	*Exercise2> main
