@@ -48,18 +48,7 @@ isDistributedEvenly xs = do
 							let m3 = m !! 2
 							let m4 = m !! 3
 							if ({-withinRange 0.0 1.0 xs) && -}(abs (m1-m2) <= mean)&& (abs (m2-m3) <= mean) && (abs (m3-m4) <= mean)) then return True else return False
-{- GHCi:
-	*Exercise1> isDistributedEvenly (probs 100000)
-	True
-	*Exercise1> isDistributedEvenly (probs 100000)
-	True
-	*Exercise1> isDistributedEvenly (probs 100000)
-	True
-	*Exercise1> isDistributedEvenly (probs 100000)
-	False
-	*Exercise1> isDistributedEvenly (probs 100000)
-	True
--}			     
+		     
 {--------------------------------------------Testing---------------------------------------------------------}
 -- we need a function to return the distribution (four quarters)
 getDistribution :: IO [Int]
@@ -91,3 +80,31 @@ testIter k n r = if k == n then print (show n ++ " tests passed")
 
 testProbs :: ([Float] -> Bool) -> IO ()
 testProbs p = testIter 1 100 p
+
+{- Report:
+	Given the property isDistributedEvenly which I implemented to check that the generator of red curry
+	succeeded to distribute generated numbers on the following ranges evenly (with a mean error of count 100 given 100000 numbers)
+	
+	(0..0.25),[0.25..0.5),[0.5..0.75),[0.75..1)
+	
+	Running isDistributedEvenly resulted into a failure to fulfil the property on the fourth test.
+	
+	{- GHCi:
+		*Exercise1> isDistributedEvenly (probs 100000)
+		True
+		*Exercise1> isDistributedEvenly (probs 100000)
+		True
+		*Exercise1> isDistributedEvenly (probs 100000)
+		True
+		*Exercise1> isDistributedEvenly (probs 100000)
+		False
+		*Exercise1> isDistributedEvenly (probs 100000)
+		True
+	
+	That leads me to two conclusion:
+	- The customer needs to define the acceptable mean error. Probably if I increase the mean, more tests can be passed.
+	- That indeed the claim is incorrect.
+	
+	I believe there is no need in this case to run testIter 100 times with the property and probs 10000 
+	because the initial test already showed that either the claim is incorrect or we miss more specifications.
+-}
