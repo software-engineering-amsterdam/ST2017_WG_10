@@ -71,19 +71,6 @@ isSelfFalse :: Eq a =>[a] -> Bool
 isSelfFalse xs      | (length xs /=0 ) = not (isDerangement xs xs)
                     | otherwise = True -- to not fail in case of isSortedNotDerangement [] []
 
-{- GHCi:
-		*Exercise5> quickCheck twoDerangementsOfAThird
-		+++ OK, passed 100 tests.
-
-		*Exercise5> quickCheck isSymmetric
-		+++ OK, passed 100 tests.
-		
-		*Exercise5> quickCheck isSortedNotDerangement
-		+++ OK, passed 100 tests.
-		
-		*Exercise5> quickCheck isSelfFalse
-		+++ OK, passed 100 tests.
--}
 
 {- Provide an ordered list of properties by strength using the weakear and stronger definitions. -}
 
@@ -135,7 +122,30 @@ strengthList :: [Int] -> [Int] -> [Int] -> [PropertyType] -> [String]
 strengthList _ _ _ [] = []
 strengthList xs ys zs ps = [convertPropertyToString p | p <- quickSortProps xs ys zs ps] 
 
-{- GHCi:
-		*Exercise5>  strengthList list1 list2 list3 [IsSymmetric, IsSortedNotDerangement, IsSelfFalse, TwoDerangementsOfAThird]
+{- Report:
+	I picked up four different properties of isDerangement that should hold.
+	
+	I implemented customized comparison methods for properties (based on strength) & implemented a customized quicksort.
+	
+	Since my properties are with different number of inputs, I made sure to generalize the compasion.
+	
+	As a result of running quickCheck for my properties:--------------
+	
+	 GHCi:
+		*Exercise5> quickCheck twoDerangementsOfAThird
+		+++ OK, passed 100 tests.
+
+		*Exercise5> quickCheck isSymmetric
+		+++ OK, passed 100 tests.
+		
+		*Exercise5> quickCheck isSortedNotDerangement
+		+++ OK, passed 100 tests.
+		
+		*Exercise5> quickCheck isSelfFalse
+		+++ OK, passed 100 tests.
+		
+	Running the comparison using my customized method resulted into the following:-------------
+	
+	*Exercise5>  strengthList list1 list2 list3 [IsSymmetric, IsSortedNotDerangement, IsSelfFalse, TwoDerangementsOfAThird]
 		["TwoDerangementsOfAThird","IsSelfFalse","IsSortedNotDerangement","IsSymmetric"]
 -}

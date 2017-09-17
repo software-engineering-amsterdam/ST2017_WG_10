@@ -94,8 +94,23 @@ main = do
 		print "Test correctness of the validator:"
 		print  testCorrectness
 
-{- GHCi:
-	*Exercise7> main
-	"Test correctness of the validator:"
-	True
-}
+
+{- Report:
+	To test iban validator, I came up with suitable list of examples of both valid and invalid iban numbers from four different countries.
+	(The Netherlands, France, Germany, and Spain).
+	
+	I coupled the expected validity truth value to each of the numbers in the list. I based that on online validator and official websites.
+	
+	I implemented a validity statement, which executes my 'iban' validator on all numbers in the list, and compare the resulting 
+	truth value from my validator with the expected truth value in the list. I ended up with 'True' for all validity checks.
+	Therefore my truth statement holds for all numbers in the list of examples.
+	
+	GHCi:
+			*Exercise7> main
+			"Test correctness of the validator:"
+			True
+
+	As a conclusion: given a chosen list of numbers (valid, invalid), my 'iban' validator passed tests. I can consider that the implementation of 'iban' is correct. We can of course extend the list to include more examples for certainty.
+	
+	Automaticing test is possible given a wide range of certain examples.
+-}

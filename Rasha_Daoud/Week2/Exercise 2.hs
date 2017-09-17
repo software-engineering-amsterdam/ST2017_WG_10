@@ -10,14 +10,6 @@ import Test.QuickCheck
 data Shape = NoTriangle | Equilateral | Isosceles  | Rectangular | Other
              deriving (Eq,Show)
 
-{- We have several options for the defined shape type:
-   1) NoTriangle
-   2) Triangle: which can be: Equilateral, Isosceles, Rectangular, or Other
-
-   We can either implement the triangle function directly.
-   But I would prefer to implement each property aside & call them to determine the type of the shape in the triangle function.
-   We need to make sure to check properties in the correct order using pattern matching in 'triangle' function.
--}
 
 {- 1* Properties ---------------------------------------------------------------}
 
@@ -49,7 +41,8 @@ isRectangular x y z   |  x*x + y*y == z*z             = True
    Implement a function to return a shape based on the three dimensions (Integers)
    Using pattern matching with the correct order would do the job.
    Correct order is very important. First we need to check whether the shape is really a triangle.
-   e.g sides (1,1,2). That is not a triangle, even though it can fulfil the property isIsosceles
+   e.g sides (1,1,2). That is not a triangle, even though it can fulfil the property isIsosceles.
+   We need to make sure to check properties in the correct order using pattern matching in 'triangle' function.
 -}
 
 triangle :: Integer -> Integer -> Integer -> Shape
@@ -106,7 +99,7 @@ testOther =   (length [triangle x y z | x <- [1..100], y <- [1..100], z <- [1..1
               -
 			  length (filter (==Other) [triangle x y z | x <- [1..100], y <- [1..100], z <- [1..100]]))
 			  == otherCount
---1^2 + 3^2 = 10 (5^2)
+
 {- GHCi:
    *Exercise2> testNoTriangle
    True
@@ -124,9 +117,20 @@ main = do
 	print testIsosceles
 	print testRectangular
 
-{- *Exercise2> main
-	True
-	True
-	True
-	True
+{- Report:
+
+  We have several options for the defined shape type:
+   1) NoTriangle
+   2) Triangle: which can be: Equilateral, Isosceles, Rectangular, or Other
+
+   Instead of implementing only one function for the triangle check, I preferred to implement each property aside & call all properties in the triangle function, to determine the type of the shape.
+   
+   After that I used a list generator to generate values for the three sides. Following the specifications of triangle & its special types on wikipedia. I could right some testable properties following properties used in the implementation of triangle function.
+
+	Results: 
+	*Exercise2> main
+		True
+		True
+		True
+		True
 -}

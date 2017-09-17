@@ -28,6 +28,7 @@ compar xs p q = let pq = stronger xs p q
                   else if qp  then "weaker"
                   else             "incomparable"
 
+
 quicksortProbs :: [Int] -> [Int] -> [Int] 
 quicksortProbs range [] = []  
 quicksortProbs range (x:xs) = 
@@ -75,3 +76,22 @@ strengthList = quicksortProbs range [0..3] -- result is [0,3,1,2]
 main = do
 	print "prop0, prop1, prop2, prop3"
 	print strengthList
+
+{- Report:
+	To automate the test, I considered a range of [-10..10]. I implemented each of the properties described in the question.
+	I took out redundant properties. I ended up with 4 different properties.
+	
+	I adjusted the comparison functions from lecture2.hs to be compatible with the definition of my properties.
+	And at the end I implemented a list of properties and passed it to a customized quick-sort function. The sorting method is based on the strength of properties when applied to all values in the given range [-10..10].
+	
+	My random list of properties is as follows:
+													[prop0, prop1, prop2, prop3] [0,3,1,2]
+	
+	*Exercise3> strengthList
+	[0,3,1,2]
+	
+	The sorted list of properties was returned as follows:
+													[prop0, prop3, prop1, prop2] [0,3,1,2]
+	
+	The list is sorted from stongest to weakest condition.
+-}
