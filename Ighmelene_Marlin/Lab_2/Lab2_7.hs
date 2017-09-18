@@ -8,15 +8,15 @@ import Test.QuickCheck
 -- 120 min
 iban :: String -> Bool
 iban s = do
-            let cc = take 2 s
-            let cd = take 2 (drop 2 s)
-            let bban = drop 4 s
+            let stripped = [c | c <- s, c /= ' ']
+            let cc = take 2 stripped
+            let cd = take 2 (drop 2 stripped)
+            let bban = drop 4 stripped
             if(isAlphaNumCS cc && isAlphaNumCI bban && bbanLength cc == length bban) then 
               do
-              let shifted = first4toEnd s
+              let shifted = first4toEnd stripped
               let subbed  = charSubstitutions shifted
               let intval  = stringToInt subbed
-              let n97     = read (show 97) :: Integer
               mod (mod intval 97) 10 == 1
             else
               False

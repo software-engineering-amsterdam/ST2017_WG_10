@@ -5,20 +5,24 @@ import Data.Char
 import System.Random
 import Test.QuickCheck
 
--- 90 min
+-- 180 min
 isPermutation :: Eq a => [a] -> [a] -> Bool
-isPermutation (x:xs) ys = length xs == length ys &&
-                          length ([x]++(filter (\a -> a == x) xs)) == length (filter (\b -> b == x) ys)
-                          
--- Properties      
-injective :: Eq a => [a] -> [a] -> Bool
-injective as bs = as == [y | x <- as, y <- bs, y == x]
+isPermutation xs ys = injective xs ys && surjective xs ys
+                  
+-- Properties
+noDuplicates :: [Int] -> Bool
+noDuplicates xs = length (filter (\n -> n > 1) (map (\x -> (length [x1 | x1 <- xs, x1 == x])) xs)) == 0
 
-surjective :: Eq a => [a] -> [a] -> Bool
-surjective as bs = bs == [x | x <- bs, elem x as]
+isSubset :: [Int] -> [Int] -> Bool
+isSubset xs ys = xs == [x | x <- xs, elem x ys]
 
-bijective :: Eq a => [a] -> [a] -> Bool
-bijective as bs = injective as bs && surjective as bs
+-- each x has exactly one y
+injective :: [Int] -> [Int] -> Bool
+injective xs ys =  noDuplicates ys && isSubset xs ys
+
+-- each y has at least one x
+surjective :: [Int] -> [Int] -> Bool
+surjective xs ys = isSubset ys xs
 
 -- Order properties by strength
 forall :: [a] -> (a -> Bool) -> Bool
@@ -27,21 +31,41 @@ forall = flip all
 (-->) :: Bool -> Bool -> Bool
 p --> q = (not p) || q
 
-stronger, weaker :: Eq a => [a] -> [a] -> LabProperty -> LabProperty -> Bool
+stronger, weaker :: [Int] -> [Int] -> LabProperty -> LabProperty -> Bool
 stronger as bs p q = forall as (\ x -> propertyCheck p as bs --> propertyCheck q as bs)
 weaker   as bs p q = stronger as bs q p 
 
-data LabProperty = Injective | Surjective | Bijective deriving (Show)
+data LabProperty = Injective | Surjective | NoDuplicates | Subset deriving (Show)
 
-propertyCheck :: Eq a => LabProperty -> [a] -> [a] -> Bool
-propertyCheck Injective as bs = injective as bs
-propertyCheck Surjective as bs = surjective as bs
-propertyCheck Bijective as bs = bijective as bs
+propertyCheck :: LabProperty -> [Int] -> [Int] -> Bool
+propertyCheck Injective xs ys = injective xs ys
+propertyCheck Surjective xs ys = surjective xs ys
+propertyCheck NoDuplicates xs ys = noDuplicates ys
+propertyCheck Subset xs ys = isSubset xs ys
 
-orderByStrength :: Eq a => [a] -> [a] -> [LabProperty] -> [LabProperty]
+orderByStrength :: [Int] -> [Int] -> [LabProperty] -> [LabProperty]
 orderByStrength as bs [] =  []
-orderByStrength as bs (p1:ps) =    orderByStrength as bs [p2 | p2 <- ps, stronger as bs p2 p1,not(weaker as bs p2 p1)]
+orderByStrength as bs (p1:ps) = orderByStrength as bs [p2 | p2 <- ps, stronger as bs p2 p1,not(weaker as bs p2 p1)]
                                 ++ [p1]
                                 ++ orderByStrength as bs [p2 | p2 <- ps, weaker as bs p2 p1]
 
--- Automate test
+hasValues :: [Int] -> [Int] -> Bool
+hasValues xs ys = length xs * length ys > 0
+
+testInjective :: IO ()
+testInjective = verboseCheck (\xs ys -> noDuplicates ys ==> isSubset xs ys ==> injective xs ys)
+
+testSurjective :: IO ()
+testSurjective = verboseCheck (\xs ys -> isSubset ys xs ==> surjective xs ys)
+
+testPermutations :: IO ()
+testPermutations = verboseCheck (\xs ys -> injective xs ys && surjective xs ys ==> isPermutation xs ys)
+
+-- If empty lists are allowed, the only passed tests are ones on 2 empty lists
+testPermutationsNoEmptyLists :: IO ()
+testPermutationsNoEmptyLists = verboseCheck (\xs ys -> hasValues xs ys ==> injective xs ys && surjective xs ys ==> isPermutation xs ys)
+
+-- Hardy any tests pass because the properties injective and surjective are not comparable so the preconditions are strong
+-- Another problem I experienced with the tests was that the few tests that did pass were of 2 empty lists
+-- so I strengthened the preconditions some more with a new property hasValues.
+-- That lead to something like 2 tests passing vs 7-9 with empty lists.

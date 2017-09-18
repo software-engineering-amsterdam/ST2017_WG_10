@@ -5,38 +5,54 @@ import Data.Char
 import System.Random
 import Test.QuickCheck
 
--- 30 min
-
+-- 120 min
 data Shape = NoTriangle | Equilateral | Isosceles  | Rectangular | Other deriving (Eq,Show)
 
-isNoTriangle :: Integer -> Integer -> Integer -> Bool
-isNoTriangle x y z =  if(length (filter (\x -> x == 0) [x,y,z]) > 0) then 
-                        True
-                      else
-                        do
-                            let abc = sort [x,y,z]
-                            let a = abc !! 0
-                            let b = abc !! 1
-                            let c = abc !! 2
-                            if(a+b >= c) then False else True
-                        
-isEquilateral :: Integer -> Integer -> Integer -> Bool
-isEquilateral x y z = if(x == y && y == z) then True else False
-
-isIsosceles :: Integer -> Integer -> Integer -> Bool
-isIsosceles x y z = if(x == y || y == z || x == z) then True else False
-
-isRectangular  :: Integer -> Integer -> Integer -> Bool
-isRectangular x y z = do
-                        let abc = sort [x,y,z]
-                        let a = abc !! 0
-                        let b = abc !! 1
-                        let c = abc !! 2
-                        if((a^2) + (b^2) == (c^2)) then True else False
-                        
 triangle :: Integer -> Integer -> Integer -> Shape
-triangle x y z  | isNoTriangle x y z = NoTriangle
+triangle x y z  | hasNegatives x y z = NoTriangle
+                | hasInequality x y z = NoTriangle
                 | isEquilateral x y z = Equilateral
                 | isIsosceles x y z = Isosceles
                 | isRectangular x y z = Rectangular
                 | otherwise = Other
+
+hasNegatives :: Integer -> Integer -> Integer -> Bool
+hasNegatives x y z = length [n | n <- [x,y,z], n <= 0] > 0
+
+hasInequality :: Integer -> Integer -> Integer -> Bool
+hasInequality x y z = let ordered = sort [x,y,z] in sum (init ordered) < last ordered
+
+isEquilateral :: Integer -> Integer -> Integer -> Bool
+isEquilateral x y z = x == y && y == z
+
+isIsosceles :: Integer -> Integer -> Integer -> Bool
+isIsosceles x y z = (x == y && x /= z) || (x == z && x /= y) || (y == z && y /= x)
+
+isRectangular :: Integer -> Integer -> Integer -> Bool
+isRectangular x y z = let ordSq = map (\n -> n * n) (sort [x,y,z]) in sum (init ordSq) == last ordSq
+
+testNoZeros :: IO ()
+testNoZeros = verboseCheck      (\x y z -> hasNegatives x y z ==> triangle x y z == NoTriangle)
+
+testInequality :: IO ()
+testInequality = verboseCheck   (\x y z -> hasInequality x y z ==> triangle x y z == NoTriangle)
+
+testEquilateral :: IO ()
+testEquilateral = verboseCheck  (\x y z -> not (hasNegatives x y z) ==> not (hasInequality x y z) ==> isEquilateral x y z ==> triangle x y z == Equilateral)
+
+testIsosceles :: IO ()
+testIsosceles = verboseCheck    (\x y z -> not (hasNegatives x y z) ==> not (hasInequality x y z) ==> isIsosceles x y z ==> triangle x y z == Isosceles)
+
+testRectangular :: IO ()
+testRectangular = verboseCheck  (\x y z -> not (hasNegatives x y z) ==> not (hasInequality x y z) ==> isRectangular x y z ==> triangle x y z == Rectangular)
+
+testOther :: IO ()
+testOther = verboseCheck        (\x y z ->  not (hasNegatives x y z) ==> 
+                                            not (hasInequality x y z) ==> 
+                                            not (isEquilateral x y z) ==> 
+                                            not (isIsosceles x y z) ==> 
+                                            not (isRectangular x y z) ==> 
+                                            triangle x y z == Other)
+
+testTriangle :: IO ()
+testTriangle = verboseCheck (\x y z -> True ==> elem (triangle x y z) [NoTriangle,Equilateral,Isosceles,Rectangular,Other])
