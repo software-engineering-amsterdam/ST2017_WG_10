@@ -26,14 +26,15 @@ import Test.QuickCheck
 
 shift = 13
 
+
 rotateChar :: Char -> Char
-rotateChar c      | elem c ['a'..'z'] = chr (97 + (mod (((ord c) - 97) + shift) 26)) -- ord 'a' = 97 & we have 26 chars in ['a'..'z']
-				  | elem c ['A'..'Z'] = chr (65 + (mod (((ord c) - 65) + shift) 26)) -- ord 'A' = 65 & we have 26 chars in ['A'..'Z']
-		          | otherwise = c -- return it as it is
-
-
+rotateChar c 
+    |elem c ['a'..'z'] = chr.(+97).(`mod` 26).(+ (-84)).ord $ c
+    |elem c ['A'..'Z'] = chr.(+65).(`mod` 26).(+ (-52)).ord $ c
+    |otherwise = c
+	
 rot13Encrypt :: String -> String
-rot13Encrypt cs = map rotateChar cs
+rot13Encrypt xs = map (rotateChar) xs
 
 {- GHCi: wiki
     *Exercise6> rot13Encrypt "Why did the chicken cross the road?"
