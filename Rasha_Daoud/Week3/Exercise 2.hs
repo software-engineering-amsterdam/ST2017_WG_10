@@ -64,9 +64,9 @@ generateForm level = do
 generateForms :: Int -> Int -> IO [Form]
 generateForms 0 _ = return []
 generateForms n l =   do
-						form <- generateForm l
-						forms <- (generateForms (n-1) l)
-						return (form:forms)
+                       form <- generateForm l
+                       forms <- (generateForms (n-1) l)
+                       return (form:forms)
 
 
 testIter :: Int -> (Form -> Bool) -> [Form] -> IO()
