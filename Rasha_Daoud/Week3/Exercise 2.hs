@@ -7,10 +7,6 @@ import System.Random
 import Test.QuickCheck
 import Lecture3
 
-{-  satisfiable :: Form -> Bool
-	satisfiable f = any (\ v -> evl v f) (allVals f)
--}
-
 {-
 	The lecture notes of this week define a function parse for parsing propositional formulas. Test this function.
 -}
@@ -36,40 +32,72 @@ getIntL k n = do
 -----------------------------------------------------------------------------------------------------------------------
 --Let us generate some forms, based on a level (0,1,2..etc.) we can define to which level in the expression we will go
 -- 0 means Prop Name, if you go to 1 then it will start using other types
+
 generateForm :: Int -> IO Form
-generateForm level =if (level < 0) then error "level of complexity cannot be below 0"
-					else if (level == 0) then
-					do	
-						n <- getRandomInt 6 -- we have 6 types of forms, we generate random number between 1 & 6
-						m <- getRandomInt 10 -- to not have the atomic always as (Prop 1), you can change 10 to int >0
-						case n of
+generateForm 0 =     do
+						n <- getRandomInt 10
+						return (Prop n)
+
+generateForm level = do
+						n <- getRandomInt 6
+						m <- getRandomInt 10
+						case n of 
 							1 -> do return (Prop m)
-							2 -> do return (Neg (Prop m))
-							3 -> do return (Cnj [(Prop m), (Prop m-1)])
-							4 -> do return (Dsj [(Prop m), (Prop m-1)])
-							5 -> do return (Impl [(Prop m), (Prop m-1)])
-							6 -> do return (Equiv (Dsj [(Prop m), (Prop m-1)])  Equiv (Dsj [(Prop m-1), (Prop m)]) )
-							otherwise -> print("the generator is not working as expected")
-			
+							2 -> do
+									frm <- generateForm (level-1)
+									return (Neg frm) 
+							3 -> do
+									frms <- generateForms m (level-1)
+									return (Dsj frms)
+							4 -> do
+									frms <- generateForms m (level-1)
+									return (Cnj frms)
+							5 -> do
+									frm1 <- generateForm (level-1)
+									frm2 <- generateForm (level-1)
+									return (Impl frm1 frm2) 
+							6 -> do
+									frm1 <- generateForm (level-1)
+									frm2 <- generateForm (level-1)
+									return (Equiv frm1 frm2) 
+							--otherwise -> print ("the integer generator is not working as expected...")
+
 generateForms :: Int -> Int -> IO [Form]
 generateForms 0 _ = return []
-generateForms n l = if (n == 0) then print ("done generating random forms")
-					else do
+generateForms n l =   do
 						form <- generateForm l
 						forms <- (generateForms (n-1) l)
 						return (form:forms)
 
-test1 :: Int -> (Form -> Bool) -> [Form] -> IO()
-test1 n _ [] = print (show n ++ " tests passed...")
-test1 n p (fi:fis) =  if p fi then
-						do print ("test passed on:" ++ show fi)
-							test1 n p fis
-						else
-							error ("test failed on:" ++ show fi)
 
-testForm :: Int -> Int -> (Form -> Bool)-> IO()
-testForm n l p = do 
+testIter :: Int -> (Form -> Bool) -> [Form] -> IO()
+testIter n p [] = print (show n ++ " tests passed...")
+testIter n p (fi:fis) = 
+					if p fi then
+						do
+							print ("test passed on:" ++ show fi)
+							testIter n p fis
+					else
+						error ("test failed on:" ++ show fi)
+  
+testForms :: Int -> Int -> (Form -> Bool)-> IO()
+testForms n l p = do 
 					forms <- generateForms n l
-					test1 n p forms
+					testIter n p forms
 
-testParse = testForm 100 0 (\str -> let [forms] = parse (show str) in show str == show forms)
+testParse :: Int -> IO()
+testParse level = testForms 100 level (\str -> let [forms] = parse(show str) in show str == show forms)
+
+
+{---------------------------------------Testing false positives----------------------------------------}
+
+-- TODO adjust us adjust the Form instance of Show
+{-
+instance Show Form where 
+-}
+
+
+main = do
+		testParse 0
+		testParse 1
+		testParse 2
