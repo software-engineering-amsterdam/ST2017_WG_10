@@ -73,6 +73,34 @@ equiv form1 form2 =    (all(\x -> evl x form1 == evl x form2) (allVals form1))
 -}
 
 ----------------------------------------------------------------------------------------------------
-{-Check that your definitions are correct.-}
+{-Check that your definitions are correct.
+	I read a bit about the properties of these propositional logic functions & the relations between each of them.
+	
+	Thanks to the haskell road book & http://sites.millersville.edu/bikenaga/math-proof/truth-tables/truth-tables.html
+	
+	There are couple of facts (properties), I can count on to test if my implementation for the functions above is correct.
+	
+	1) a logical statement is satisfiable if it is not a contradiction,
+	which means at least evaluating the statement with at least one x gives false.
+	
+	2) a logical statement is tautology if it is not a contradiction (at least one evaluation result is false), but also satisfiable
+	
+	3) two logical statements are equivalent, if one entails the other.
+	
+	4) a logical statement is contradiction, if it is not satisfiable (one false evaluation result)
+	 and it is not a tautology.
+
+-}
 
 
+checkCorrectness :: Form -> Form -> Bool
+checkCorrectness f1 f2 = satisfiable f1 == not (contradiction f1) &&
+                         equiv f1 f2 == (entails f1 f2) && (entails f2 f1) &&
+                         tautology f1 == satisfiable f1 && not(contradiction f1) &&
+                         tautology f2 == satisfiable f2 && not(contradiction f2) &&
+                         contradiction f1 == not (satisfiable f1) && not (tautology f1) &&
+                         contradiction f2 == not (satisfiable f2) && not (tautology f2)
+
+-- We can now generate forms & call checkCorrectness to check. (TODO add same generator from my exercise 2)
+
+ 
