@@ -41,7 +41,7 @@ generateForm 0 = do
 generateForm level = do
                         n <- getRandomInt 6
                         m <- getRandomInt 10
-						case n of 
+                        case n of 
                             1 -> do return (Prop m)
                             2 -> do
                                     frm <- generateForm (level-1)
@@ -60,7 +60,6 @@ generateForm level = do
                                     frm1 <- generateForm (level-1)
                                     frm2 <- generateForm (level-1)
                                     return (Equiv frm1 frm2) 
-							--otherwise -> print ("the integer generator is not working as expected...")
 
 generateForms :: Int -> Int -> IO [Form]
 generateForms 0 _ = return []
