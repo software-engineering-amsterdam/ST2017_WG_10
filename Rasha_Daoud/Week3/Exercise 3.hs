@@ -47,7 +47,7 @@ convert2CNF form = cnf $ nnf $ arrowfree form -- lecture 3 slides
                Cnj [Dsj [(Neg (Prop1)), Impl (Prop 1) (Prop4)]]
 
     - original form  
-	  *Exercise1> tautology (Dsj [Neg (Prop 3), Impl (Prop 1) (Prop 4)])
+     *Exercise1> tautology (Dsj [Neg (Prop 3), Impl (Prop 1) (Prop 4)])
       False
       *Exercise1> satisfiable (Dsj [Neg (Prop 3), Impl (Prop 1) (Prop 4)])
       True
