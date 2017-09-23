@@ -62,7 +62,7 @@ generateForm level = do
                                     return (Equiv frm1 frm2) 
 
 -- Generates n formulas with level l
-generateForms :: Int -> Int -> IO [Form]
+generateForms :: Int -> Int -> [Form]
 generateForms 0 _ = return []
 generateForms n l =   do
                        form <- generateForm l
