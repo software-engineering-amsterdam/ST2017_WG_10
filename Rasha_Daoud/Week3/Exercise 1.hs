@@ -93,18 +93,29 @@ equiv form1 form2 =  (all(\x -> evl x form1 == evl x form2) (allVals form1)) &&
 	
 	4) a logical statement is contradiction, if it is not satisfiable (one false evaluation result)
 	 and it is not a tautology.
+	 
+	5) two logical statements are equivalent, if each of them entails the other.
 
 -}
 
--- Let's define the properties as follows:
+-- Let's define some properties as follows:
 property1, property2, property3:: Form -> Bool
+
 property1 f1 = satisfiable f1 == not (contradiction f1)
+
 property2 f1 = contradiction f1 == not (satisfiable f1) && not (tautology f1)
+
 property3 f1 = tautology f1 == satisfiable f1 && not(contradiction f1)
 
-property4, property5 :: Form -> Form -> Bool
+
+
+property4, property5, property6 :: Form -> Form -> Bool
+
 property4 f1 f2 = equiv f1 f2 == (entails f1 f2) && (entails f2 f1)
+
 property5 f1 f2 = entails f1 (Dsj [f1,f2])
+
+property6 f1 f2 = equiv f1 f2 == (entails f1 f2 && entails f2 f1)
 
 {- GHCi: 
         *Exercise1> property1 form1
@@ -117,6 +128,8 @@ property5 f1 f2 = entails f1 (Dsj [f1,f2])
         True
         *Exercise1> property5 form1 form2
         True
+		*Exercise1> property6 (Neg p) (Neg (Neg (Neg p)))
+        True
 -}
 
 -- We can check all properties using the following function
@@ -126,6 +139,7 @@ checkCorrectness f1 f2    | satisfiable f1 = property1 f1
                           | tautology f1 = property3 f1
                           | equiv f1 f2 = property4 f1 f2
 						  | entails f1 (Dsj [f1,f2]) = property5 f1 f2
+						  | equiv f1 f2 = property6 f1 f2
                           | otherwise = False
 
 {- GHCi:
