@@ -138,8 +138,8 @@ checkCorrectness f1 f2    | satisfiable f1 = property1 f1
                           | contradiction f1 = property2 f1
                           | tautology f1 = property3 f1
                           | equiv f1 f2 = property4 f1 f2
-						  | entails f1 (Dsj [f1,f2]) = property5 f1 f2
-						  | equiv f1 f2 = property6 f1 f2
+                          | entails f1 (Dsj [f1,f2]) = property5 f1 f2
+                          | equiv f1 f2 = property6 f1 f2
                           | otherwise = False
 
 {- GHCi:
