@@ -1,4 +1,4 @@
---  formula generator -time:
+--  formula generator -time: 1 hour
 
 module Exercise4 where
 
@@ -7,7 +7,7 @@ import System.Random
 import Test.QuickCheck
 import Lecture3
 
--- We can use the following functions from lecture 2, changing 0 to 1
+-- We can use the following functions from lecture 2, to generate list of integers between 1 and n
 getRandomInt :: Int -> IO Int
 getRandomInt n = getStdRandom (randomR (1,n))
 
@@ -25,13 +25,19 @@ getIntL k n = do
    return (y:xs)
 
 ----------------------------------------------------------
---Let us generate some forms, based on a depth (0,1,2..etc.) we can define to which level in the expression we will go
--- 0 means Prop Name, if you go to 1 then it will start using other types
-generateForm :: Int -> IO Form
+{- Let us generate some forms, based on a depth (0,1,2..etc.) we can define to which level in the expression we will go
+ -  0 means Prop Name (Atomic form)
+ - we can also generate forms with a certain depth or level
+ - considering forms as trees, level > 0 means we will start using other types of forms rather than the atomic.
+-}
+
+-- Atomic formula
+generateForm :: Int -> Form
 generateForm 0 = do
                     n <- getRandomInt 10
                     return (Prop n)
 
+-- Other types of formulas
 generateForm level = do
                         n <- getRandomInt 6
                         m <- getRandomInt 10
@@ -55,6 +61,7 @@ generateForm level = do
                                     frm2 <- generateForm (level-1)
                                     return (Equiv frm1 frm2) 
 
+-- Generates n formulas with level l
 generateForms :: Int -> Int -> IO [Form]
 generateForms 0 _ = return []
 generateForms n l =   do
@@ -62,27 +69,28 @@ generateForms n l =   do
                        forms <- (generateForms (n-1) l)
                        return (form:forms)
 
+{-----------------------------------------------Testing properties---------------------------------------------------}
+-- 1) the formula is not implication or equivalence.
+hasNoArrows :: Form -> Bool
+hasNoArrows form | form == arrowfree form = True
+                     | otherwise = False
 
-testIter :: Int -> (Form -> Bool) -> [Form] -> IO()
-testIter n p [] = print (show n ++ " tests passed...")
-testIter n p (fi:fis) = 
-                        if p fi then
-                         do
-                          print ("test passed on:" ++ show fi)
-                          testIter n p fis
-                        else
-                          error ("test failed on:" ++ show fi)
-  
-testForms :: Int -> Int -> (Form -> Bool)-> IO()
-testForms n l p = do 
-                      forms <- generateForms n l
-                      testIter n p forms
+-- 2) the formula has noly properties & negations
+hasOnlyNeg :: Form -> Bool
+hasOnlyNeg form | (Prop n) = True
+                | (Neg frm) = hasOnlyNeg frm
+                | otherwise = False
 
-testParse :: Int -> IO()
-testParse level = testForms 100 level (\str -> let [forms] = parse(show str) in show str == show forms)
+-- 3) the formula is at depth of 0 or 1 (or negation only)
+NotDeeperThan1 :: Form -> Bool
+NotDeeperThan1 (Prop _)      = True
+NotDeeperThan1 (Neg (Prop _))= True
+NotDeeperThan1 (Neg _)       = False
+NotDeeperThan1 (Equiv _ _)   = False
+NotDeeperThan1 (Impl _ _)    = False
+NotDeeperThan1 (Cnj frms)    = all (hasOnlyNeg frms)
+NotDeeperThan1 (Dsj frms)    = all (NotDeeperThan1 frms)
 
-
-main = do
-          testParse 0
-          testParse 1
-          testParse 2
+{- Report: 
+   
+-}
