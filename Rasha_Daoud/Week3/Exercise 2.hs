@@ -1,4 +1,4 @@
--- testing parse -time:
+-- testing parse -time: 1 hour, 10 minutes
 
 module Exercise2 where
 
