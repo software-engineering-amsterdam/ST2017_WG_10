@@ -32,7 +32,7 @@ getIntL k n = do
 -}
 
 -- Atomic formula
-generateForm :: Int -> Form
+generateForm :: Int -> IO Form
 generateForm 0 = do
                     n <- getRandomInt 10
                     return (Prop n)
@@ -62,7 +62,7 @@ generateForm level = do
                                     return (Equiv frm1 frm2) 
 
 -- Generates n formulas with level l
-generateForms :: Int -> Int -> [Form]
+generateForms :: Int -> Int -> IO [Form]
 generateForms 0 _ = return []
 generateForms n l =   do
                        form <- generateForm l
@@ -77,19 +77,21 @@ hasNoArrows form | form == arrowfree form = True
 
 -- 2) the formula has noly properties & negations
 hasOnlyNeg :: Form -> Bool
-hasOnlyNeg form | (Prop n) = True
-                | (Neg frm) = hasOnlyNeg frm
-                | otherwise = False
+hasOnlyNeg (Prop n)   = True
+hasOnlyNeg (Neg frm)  = hasOnlyNeg frm
+hasOnlyNeg _          = False
 
--- 3) the formula is at depth of 0 or 1 (or negation only)
 NotDeeperThan1 :: Form -> Bool
 NotDeeperThan1 (Prop _)      = True
-NotDeeperThan1 (Neg (Prop _))= True
+NotDeeperThan1 (Neg frm)     = hasOnlyNeg frm
 NotDeeperThan1 (Neg _)       = False
 NotDeeperThan1 (Equiv _ _)   = False
 NotDeeperThan1 (Impl _ _)    = False
 NotDeeperThan1 (Cnj frms)    = all (hasOnlyNeg frms)
 NotDeeperThan1 (Dsj frms)    = all (NotDeeperThan1 frms)
+
+-- 3) the formula is at depth of 0 or 1 (or negation only)
+
 
 {- Report: 
    
