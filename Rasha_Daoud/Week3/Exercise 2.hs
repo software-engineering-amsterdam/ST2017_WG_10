@@ -30,14 +30,19 @@ getIntL k n = do
 
 
 -----------------------------------------------------------------------------------------------------------------------
---Let us generate some forms, based on a level (0,1,2..etc.) we can define to which level in the expression we will go
--- 0 means Prop Name, if you go to 1 then it will start using other types
+{- Let us generate some forms, based on a depth (0,1,2..etc.) we can define to which level in the expression we will go
+ -  0 means Prop Name (Atomic form)
+ - we can also generate forms with a certain depth or level
+ - considering forms as trees, level > 0 means we will start using other types of forms rather than the atomic.
+-}
 
+-- Atomic formula
 generateForm :: Int -> IO Form
 generateForm 0 = do
                     n <- getRandomInt 10
                     return (Prop n)
 
+-- Other types of formulas
 generateForm level = do
                         n <- getRandomInt 6
                         m <- getRandomInt 10
@@ -61,6 +66,7 @@ generateForm level = do
                                     frm2 <- generateForm (level-1)
                                     return (Equiv frm1 frm2) 
 
+-- Generates n formulas with level l
 generateForms :: Int -> Int -> IO [Form]
 generateForms 0 _ = return []
 generateForms n l =   do
@@ -84,19 +90,29 @@ testForms n l p = do
                       forms <- generateForms n l
                       testIter n p forms
 
+-- testParse to call the test function 100 times with a certain level.
 testParse :: Int -> IO()
 testParse level = testForms 100 level (\str -> let [forms] = parse(show str) in show str == show forms)
 
 
 {---------------------------------------Testing false positives----------------------------------------}
+-- We can prepare a list of invalid forms
+invalidForms = [
+                 "(3 - <=> 4)", "*1 ==> 4)", "(+-*(3 2)", 
+                 "))(*(3 )", "+( *(3 4)+(2 1)" , "-+2 3)"
+                ]
+-- if parse returned [] for invalid forms, then the test is valid. Parse should not crash!!
+testParseInvalidForms :: IO Bool
+testParseInvalidForms = return (all (\x -> (parse x) == []) invalidForms)
 
--- TODO adjust us adjust the Form instance of Show
-{-
-instance Show Form where 
--}
 
-
+{---------------------------------------Testing parse----------------------------------------}
 main = do
-          testParse 0
-          testParse 1
-          testParse 2
+          print "Testing parse with atomic forms:"
+          testParse 0;
+          print "Testing parse with forms (depth 1):"
+          testParse 1;
+          print "Testing parse with forms (depth 2):"
+          testParse 2;
+          print "Testing parse with invalid forms:"
+          testParseInvalidForms;
