@@ -1,4 +1,4 @@
--- lab1 -time: 20 minutes
+-- lab1 -time: 30 minutes
 
 module Exercise1 where
 
@@ -18,12 +18,14 @@ contradiction :: Form -> Bool
 contradiction form = noElemSatisfies (\x -> evl x form) (allVals form)
 
 {- GHCi:
-		*Exercise1> contradiction form1
-		False
-		*Exercise1> contradiction form2
-		False
-		*Exercise1> contradiction form3
-		False
+        *Exercise1> contradiction form1
+        False
+        *Exercise1> contradiction form2
+        False
+        *Exercise1> contradiction form3
+        False
+        *Exercise1> contradiction (Cnj [p, Neg p])
+        True
 -}
 
 
@@ -39,37 +41,39 @@ tautology :: Form -> Bool
 tautology form = allElementsSatisfy (\x -> evl x form) (allVals form)
 
 {- GHCi:
-		*Exercise1> tautology form1
-		True
-		*Exercise1> tautology form2
-		False
-		*Exercise1> tautology form3
-		True
+        *Exercise1> tautology form1
+        True
+        *Exercise1> tautology form2
+        False
+        *Exercise1> tautology form3
+        True
 -}
 
 ----------------------------------------------------------------------------------------------------
 {- form1 entails form2, if for every (all) x, evaluating form1 with x is true, then evaluating form2 with x is also true -}
 entails :: Form -> Form -> Bool
-entails form1 form2 =  (all(\x -> evl x form1 --> evl x form2) (allVals form1))
-                       &&
+entails form1 form2 =  (all(\x -> evl x form1 --> evl x form2) (allVals form1)) &&
                        (all(\x -> evl x form1 --> evl x form2) (allVals form2))
 {- GHCi:
 		*Exercise1> entails form1 form1
+		True
+		*Exercise1> entails form2 form1
 		True
 		*Exercise1> entails (Impl p q) (Impl (Neg q) (Neg p))
 		True
 -}
 
 ----------------------------------------------------------------------------------------------------
-{- two statements or formulas are equivalent, if no matter x is, evaluating form1 & form2 with x return the same truth value -}
+{- two statements or formulas are equivalent, if no matter x, evaluating form1 & form2 with x return the same truth value -}
 equiv :: Form -> Form -> Bool
-equiv form1 form2 =    (all(\x -> evl x form1 == evl x form2) (allVals form1))
-                       &&
-                       (all(\x -> evl x form1 == evl x form2) (allVals form2))
+equiv form1 form2 =  (all(\x -> evl x form1 == evl x form2) (allVals form1)) &&
+                     (all(\x -> evl x form1 == evl x form2) (allVals form2))
 
 {- GHCi:
 		*Exercise1> equiv (Impl p q) (Impl (Neg q) (Neg p))
 		True
+		*Exercise1> equiv (Cnj [p,q]) (Cnj [p,q])
+        True
 -}
 
 ----------------------------------------------------------------------------------------------------
@@ -92,15 +96,49 @@ equiv form1 form2 =    (all(\x -> evl x form1 == evl x form2) (allVals form1))
 
 -}
 
+-- Let's define the properties as follows:
+property1, property2, property3:: Form -> Bool
+property1 f1 = satisfiable f1 == not (contradiction f1)
+property2 f1 = contradiction f1 == not (satisfiable f1) && not (tautology f1)
+property3 f1 = tautology f1 == satisfiable f1 && not(contradiction f1)
 
+property4, property5 :: Form -> Form -> Bool
+property4 f1 f2 = equiv f1 f2 == (entails f1 f2) && (entails f2 f1)
+property5 f1 f2 = entails f1 (Dsj [f1,f2])
+
+{- GHCi: 
+        *Exercise1> property1 form1
+        True
+        *Exercise1> property2 (Cnj [p, Neg p])
+        True
+        *Exercise1> property3 form1
+        True
+        *Exercise1> property4 (Impl p q) (Impl (Neg q) (Neg p))
+        True
+        *Exercise1> property5 form1 form2
+        True
+-}
+
+-- We can check all properties using the following function
 checkCorrectness :: Form -> Form -> Bool
-checkCorrectness f1 f2 = satisfiable f1 == not (contradiction f1) &&
-                         equiv f1 f2 == (entails f1 f2) && (entails f2 f1) &&
-                         tautology f1 == satisfiable f1 && not(contradiction f1) &&
-                         tautology f2 == satisfiable f2 && not(contradiction f2) &&
-                         contradiction f1 == not (satisfiable f1) && not (tautology f1) &&
-                         contradiction f2 == not (satisfiable f2) && not (tautology f2)
+checkCorrectness f1 f2    | satisfiable f1 = property1 f1
+                          | contradiction f1 = property2 f1
+                          | tautology f1 = property3 f1
+                          | equiv f1 f2 = property4 f1 f2
+						  | entails f1 (Dsj [f1,f2]) = property5 f1 f2
+                          | otherwise = False
 
--- We can now generate forms & call checkCorrectness to check. (TODO add same generator from my exercise 2)
-
- 
+{- GHCi:
+        *Exercise1> checkCorrectness form1 form2
+        True
+        *Exercise1> checkCorrectness form1 form1
+        True
+        *Exercise1> checkCorrectness (Cnj [p, Neg p]) form1
+        True
+        *Exercise1> checkCorrectness (Dsj [p, q]) (Dsj [q, p])
+        True
+        *Exercise1> checkCorrectness (Impl p q) (Impl (Neg q) (Neg p))
+        True
+        *Exercise1> checkCorrectness form1 form2
+        True
+-}
