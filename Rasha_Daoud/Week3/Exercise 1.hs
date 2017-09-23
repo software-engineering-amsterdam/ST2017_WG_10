@@ -128,7 +128,7 @@ property6 f1 f2 = equiv f1 f2 == (entails f1 f2 && entails f2 f1)
         True
         *Exercise1> property5 form1 form2
         True
-		*Exercise1> property6 (Neg p) (Neg (Neg (Neg p)))
+        *Exercise1> property6 (Neg p) (Neg (Neg (Neg p)))
         True
 -}
 
