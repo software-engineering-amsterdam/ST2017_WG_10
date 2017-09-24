@@ -26,6 +26,7 @@ replacementLaws f = (removeDuplicates.commutativity.associativity.distributivity
 
 -- Only applies distributivity over disjunctions to replace disjunctions with conjunctions
 distributivity :: Form -> Form
+distributivity (Dsj [p])      = distributivity p
 distributivity (Dsj [p,q])    = distributivityDsj p q
 distributivity (Dsj (p:q:fs)) = let redistributed = distributivityDsj p q in replacementLaws (Dsj ([redistributed]++fs))
 distributivity f              = f
