@@ -48,22 +48,22 @@ getIntL k n = do
    return (y:xs)
 
 ----------------------------------------------------------
-{- Specification: formula generator
-The formula generator can generate Atomic statements (Prop name). Which we will name as a formula with depth (level) 0.
-We can use level = 0 as a base case for the recursion, when generating forms with bigger depth.
+{- Specifications: formula generator
+ The formula generator can generate Atomic statements (Prop name). Which we will name as a formula with depth (level) 0.
+ We can use level = 0 as a base case for the recursion, when generating forms with bigger depth.
 
-While generating forms with a certain depth is considered as trees. 
-level > 0 means that we have to generate other types of forms rather than atomic forms.
+ While generating forms with a certain depth is considered as trees. 
+ level > 0 means that we have to generate other types of forms rather than atomic forms.
 
-We can use a random Int generator from lecture 2 (see previous section) to get the Int (name) for atomic forms.
+ We can use a random Int generator from lecture 2 (see previous section) to get the Int (name) for atomic forms.
 
-We can also use the same Int generator to generate the number of formulas we're adding in each level of the complex formula (tree),
-while reducing level each time to (level -1) to go one step down until we reach level 0,
-in which the generator will add an atomic form (leaf). 
+ We can also use the same Int generator to generate the number of formulas we're adding in each level of the complex formula (tree),
+ while reducing level each time to (level -1) to go one step down until we reach level 0,
+ in which the generator will add an atomic form (leaf). 
 
-Furthermore, we can also generate the type of the form we're creating in each level, using the Int generator.
-The generated Int will be between 1 and 6. Based on the generated number,
-we choose between form options (Prop, Neg, Dsj, Cnj, Impl , Equiv).
+ Furthermore, we can also generate the type of the form we're creating in each level, using the Int generator.
+ The generated Int will be between 1 and 6. Based on the generated number,
+ we choose between form options (Prop, Neg, Dsj, Cnj, Impl , Equiv).
 -}
 
 -- Basecase - Atomic formula
@@ -133,7 +133,7 @@ iscnf _                = True
 testCNF :: Form ->  Bool
 testCNF frm = (hasNoArrows frm) &&
                (isnnf frm)&&
-			   (iscnf frm)
+               (iscnf frm)
 
 {- Let us test the n generated forms with the defined property.
 We have to convert each of the generated forms to CNF using the convertor from exercise 3, before we check CNF properties. -}
@@ -146,7 +146,7 @@ testIter n p (fi:fis) =
                           testIter n p fis
                         else
                           error ("test failed on:" ++ show fi)
-				  
+
 testForms :: Int -> Int -> (Form -> Bool)-> IO()
 testForms n l p = do 
                       forms <- generateForms n l
@@ -157,5 +157,18 @@ test100Form:: Int -> IO()
 test100Form level = testForms 100 level testCNF
 
 {- Report: 
+   Using similar form generator to the one implemented in exercise 2,
+   we can generate 100 forms with a certain level. 
+   before we check the generated form against the defined property testCNF or any sub property (3),
+   we call convert2CNF to convert the generated form to CNF.
+   
+   Next, we can do the check.
+   
+   test100Form can test 100 generated forms with different types (depending on level, level 0 means only atomic items).
+   All forms should hold for testCNF, because we're converting them before checking the property.
+   
+   In case we called test100Form with different levels (e.g 3 levels), each time we get 100 forms.
+   
+   If test100Form passed successfully, that means we've succeeded to test the property against 300 forms.
    
 -}
