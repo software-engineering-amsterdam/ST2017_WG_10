@@ -1,4 +1,4 @@
--- lab1 -time: 30 minutes
+-- lab1 -time: 40 minutes
 
 module Exercise1 where
 
