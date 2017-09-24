@@ -72,7 +72,7 @@ equiv form1 form2 =  (all(\x -> evl x form1 == evl x form2) (allVals form1)) &&
 {- GHCi:
 		*Exercise1> equiv (Impl p q) (Impl (Neg q) (Neg p))
 		True
-		*Exercise1> equiv (Cnj [p,q]) (Cnj [p,q])
+		*Exercise1> equiv (Cnj [p,q]) (Cnj [q,p])
         True
 -}
 
