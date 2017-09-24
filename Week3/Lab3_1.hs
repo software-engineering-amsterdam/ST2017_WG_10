@@ -69,11 +69,11 @@ equiv form1 form2 =  (all(\x -> evl x form1 == evl x form2) (allVals form1)) &&
 
 ----------------------------------------------------------------------------------------------------
 {- Check that your definitions are correct.
-	I read a bit about the properties of these propositional logic functions & the relations between each of them.
+	We read a bit about the properties of these propositional logic functions & the relations between each of them.
 	
 	Thanks to the haskell road book & http://sites.millersville.edu/bikenaga/math-proof/truth-tables/truth-tables.html
 	
-	There are couple of facts (properties), I can count on to test if my implementation for the functions above is correct.
+	There are couple of facts (properties), we can count on to test if my implementation for the functions above is correct.
 	
 	1) a logical statement is satisfiable if it is not a contradiction,
 	which means at least evaluating the statement with at least one x gives false.
