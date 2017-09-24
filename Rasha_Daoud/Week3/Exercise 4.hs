@@ -25,13 +25,25 @@ getIntL k n = do
    return (y:xs)
 
 ----------------------------------------------------------
-{- Let us generate some forms, based on a depth (0,1,2..etc.) we can define to which level in the expression we will go
- -  0 means Prop Name (Atomic form)
- - we can also generate forms with a certain depth or level
- - considering forms as trees, level > 0 means we will start using other types of forms rather than the atomic.
+{- Specification: formula generator
+The formula generator can generate Atomic statements (Prop name). Which we will name as a formula with depth (level) 0.
+We can use level = 0 as a base case for the recursion, when generating forms with bigger depth.
+
+While generating forms with a certain depth is considered as trees. 
+level > 0 means that we have to generate other types of forms rather than atomic forms.
+
+We can use a random Int generator from lecture 2 (see previous section) to get the Int (name) for atomic forms.
+
+We can also use the same Int generator to generate the number of formulas we're adding in each level of the complex formula (tree),
+while reducing level each time to (level -1) to go one step down until we reach level 0,
+in which the generator will add an atomic form (leaf). 
+
+Furthermore, we can also generate the type of the form we're creating in each level, using the Int generator.
+The generated Int will be between 1 and 6. Based on the generated number,
+we choose between form options (Prop, Neg, Dsj, Cnj, Impl , Equiv).
 -}
 
--- Atomic formula
+-- Basecase - Atomic formula
 generateForm :: Int -> IO Form
 generateForm 0 = do
                     n <- getRandomInt 10
@@ -81,6 +93,7 @@ hasOnlyNeg (Prop n)   = True
 hasOnlyNeg (Neg frm)  = hasOnlyNeg frm
 hasOnlyNeg _          = False
 
+-- 3) the formula is at depth of 0 or 1 (or negation only)
 NotDeeperThan1 :: Form -> Bool
 NotDeeperThan1 (Prop _)      = True
 NotDeeperThan1 (Neg frm)     = hasOnlyNeg frm
@@ -89,8 +102,6 @@ NotDeeperThan1 (Equiv _ _)   = False
 NotDeeperThan1 (Impl _ _)    = False
 NotDeeperThan1 (Cnj frms)    = all (hasOnlyNeg frms)
 NotDeeperThan1 (Dsj frms)    = all (NotDeeperThan1 frms)
-
--- 3) the formula is at depth of 0 or 1 (or negation only)
 
 
 {- Report: 
