@@ -7,6 +7,29 @@ import System.Random
 import Test.QuickCheck
 import Lecture3
 
+
+-- intermediate convertor from proposational form into CNF, we apply it after we remove arrows and then apply nnf - lecture 3 slides
+cnf :: Form -> Form
+cnf (Prop n)       = Prop n
+cnf (Neg (Prop n)) = Neg (Prop n)
+cnf (Neg frm)      = Neg (cnf frm)
+cnf (Dsj frms)     = if (length frms) == 0 then (Dsj []) else if (length frms) == 1 then do (cnf (head frms))
+                     else (applyMorganLaw (cnf (head frms)) (Dsj (tail frms)))
+cnf (Cnj frms)     = Cnj (map cnf frms)
+cnf _              = Cnj []
+
+-- morgan law needed for the conversion
+applyMorganLaw :: Form -> Form -> Form
+applyMorganLaw frm frm'                     = Cnj [frm, frm']
+applyMorganLaw (Cnj (frm:frms)) frm'        = Cnj [applyMorganLaw frm frm', applyMorganLaw (Cnj frms) frm']
+applyMorganLaw frm (Cnj (frm':frms))        = Cnj [applyMorganLaw frm frm', applyMorganLaw frm (Cnj frms)]
+
+-- converts a proposational form into CNF
+convert2CNF :: Form -> Form
+convert2CNF form = cnf $ nnf $ arrowfree form -- lecture 3 slides
+
+
+-------------
 -- We can use the following functions from lecture 2, to generate list of integers between 1 and n
 getRandomInt :: Int -> IO Int
 getRandomInt n = getStdRandom (randomR (1,n))
@@ -85,24 +108,53 @@ generateForms n l =   do
 -- 1) the formula is not implication or equivalence.
 hasNoArrows :: Form -> Bool
 hasNoArrows form | form == arrowfree form = True
-                     | otherwise = False
+                 | otherwise = False
 
--- 2) the formula has noly properties & negations
-hasOnlyNeg :: Form -> Bool
-hasOnlyNeg (Prop n)   = True
-hasOnlyNeg (Neg frm)  = hasOnlyNeg frm
-hasOnlyNeg _          = False
+-- 2) the converted CNF formula is NNF
+isnnf :: Form -> Bool
+isnnf form | form == nnf form = True
+                 | otherwise = False
 
--- 3) the formula is at depth of 0 or 1 (or negation only)
-NotDeeperThan1 :: Form -> Bool
-NotDeeperThan1 (Prop _)      = True
-NotDeeperThan1 (Neg frm)     = hasOnlyNeg frm
-NotDeeperThan1 (Neg _)       = False
-NotDeeperThan1 (Equiv _ _)   = False
-NotDeeperThan1 (Impl _ _)    = False
-NotDeeperThan1 (Cnj frms)    = all (hasOnlyNeg frms)
-NotDeeperThan1 (Dsj frms)    = all (NotDeeperThan1 frms)
+{- 3) the formula is indeed a CNF -}
+-- 3.1) helper function
+isdsj :: Form -> Bool
+isdsj (Cnj frms)       = False
+isdsj (Dsj (frm:frms)) = (isdsj (Dsj frms)) && (isdsj frm)
+isdsj _                = True
 
+-- 3.2) main function to check whether a statement is in cnf form
+iscnf :: Form -> Bool
+iscnf (Cnj frms)       = all iscnf frms
+iscnf (Dsj (frm:frms)) = (iscnf (Dsj frms)) && (isdsj frm)
+iscnf _                = True
+
+
+-- This is the main property, to check whether a form is a CNF, using previous defined properties
+testCNF :: Form ->  Bool
+testCNF frm = (hasNoArrows frm) &&
+               (isnnf frm)&&
+			   (iscnf frm)
+
+{- Let us test the n generated forms with the defined property.
+We have to convert each of the generated forms to CNF using the convertor from exercise 3, before we check CNF properties. -}
+testIter :: Int -> (Form -> Bool) -> [Form] -> IO()
+testIter n p [] = print (show n ++ " tests passed...")
+testIter n p (fi:fis) = 
+                        if p (convert2CNF fi) then
+                         do
+                          print ("test passed on:" ++ show fi)
+                          testIter n p fis
+                        else
+                          error ("test failed on:" ++ show fi)
+				  
+testForms :: Int -> Int -> (Form -> Bool)-> IO()
+testForms n l p = do 
+                      forms <- generateForms n l
+                      testIter n p forms
+
+-- We can now generate 100 forms (n) with a certain level, convert them all to CNF and check whether testCNF property holds for all!!
+test100Form:: Int -> IO()
+test100Form level = testForms 100 level testCNF
 
 {- Report: 
    
