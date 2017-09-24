@@ -20,10 +20,15 @@ cnf _              = Cnj []
 
 -- morgan law needed for the conversion
 applyMorganLaw :: Form -> Form -> Form
+applyMorganLaw (Cnj []) frm                 = Cnj []
+applyMorganLaw frm (Cnj [])                 = Cnj []
 applyMorganLaw frm frm'                     = Cnj [frm, frm']
+applyMorganLaw (Cnj [frm]) frm'             = applyMorganLaw frm frm'
+applyMorganLaw frm' (Cnj [frm])             = applyMorganLaw frm' frm 
+applyMorganLaw (Cnj frms) frm               = Dsj ([frm]++ [frm])
+applyMorganLaw frm (Cnj frms)               = Dsj (frm: [frm])
 applyMorganLaw (Cnj (frm:frms)) frm'        = Cnj [applyMorganLaw frm frm', applyMorganLaw (Cnj frms) frm']
 applyMorganLaw frm (Cnj (frm':frms))        = Cnj [applyMorganLaw frm frm', applyMorganLaw frm (Cnj frms)]
-
 
 -- converts a proposational form into CNF
 convert2CNF :: Form -> Form
@@ -60,7 +65,7 @@ iscnf _                = True
 testCNF :: Form ->  Bool
 testCNF frm = (hasNoArrows frm) &&
                (isnnf frm)&&
-			   (iscnf frm)
+               (iscnf frm)
 
 {- We can pass any form to the conversion function.
 
