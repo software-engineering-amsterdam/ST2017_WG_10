@@ -1,4 +1,4 @@
--- converting formulas into CNF -time: 1 hour
+-- converting formulas into CNF -time: 1 hour, 10 minutes
 module Exercise3 where
 
 import Data.List
@@ -56,8 +56,8 @@ isdsj _                = True
 
 -- 3.2) main function to check whether a statement is in cnf form
 iscnf :: Form -> Bool
-iscnf (Cnj frms)       = all iscnf frms
-iscnf (Dsj (frm:frms)) = (iscnf (Dsj frms)) && (isdsj frm)
+iscnf (Cnj frms)       = and [iscnf frm | frm <- frms]
+iscnf (Dsj (frm:frms)) = (iscnf (Dsj frms))
 iscnf _                = True
 
 

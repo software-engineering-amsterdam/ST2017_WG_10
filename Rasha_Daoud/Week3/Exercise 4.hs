@@ -1,4 +1,4 @@
---  formula generator -time: 1 hour
+--  formula generator -time: 1 hour, 20 minutes
 
 module Exercise4 where
 
@@ -8,6 +8,7 @@ import Test.QuickCheck
 import Lecture3
 
 
+--import Exercise3
 -- intermediate convertor from proposational form into CNF, we apply it after we remove arrows and then apply nnf - lecture 3 slides
 cnf :: Form -> Form
 cnf (Prop n)       = Prop n
@@ -18,9 +19,16 @@ cnf (Dsj frms)     = if (length frms) == 0 then (Dsj []) else if (length frms) =
 cnf (Cnj frms)     = Cnj (map cnf frms)
 cnf _              = Cnj []
 
+
 -- morgan law needed for the conversion
 applyMorganLaw :: Form -> Form -> Form
+applyMorganLaw (Cnj []) frm                 = Cnj []
+applyMorganLaw frm (Cnj [])                 = Cnj []
 applyMorganLaw frm frm'                     = Cnj [frm, frm']
+applyMorganLaw (Cnj [frm]) frm'             = applyMorganLaw frm frm'
+applyMorganLaw frm' (Cnj [frm])             = applyMorganLaw frm' frm 
+applyMorganLaw (Cnj frms) frm               = Dsj ([frm]++ [frm])
+applyMorganLaw frm (Cnj frms)               = Dsj (frm: [frm])
 applyMorganLaw (Cnj (frm:frms)) frm'        = Cnj [applyMorganLaw frm frm', applyMorganLaw (Cnj frms) frm']
 applyMorganLaw frm (Cnj (frm':frms))        = Cnj [applyMorganLaw frm frm', applyMorganLaw frm (Cnj frms)]
 
@@ -28,8 +36,6 @@ applyMorganLaw frm (Cnj (frm':frms))        = Cnj [applyMorganLaw frm frm', appl
 convert2CNF :: Form -> Form
 convert2CNF form = cnf $ nnf $ arrowfree form -- lecture 3 slides
 
-
--------------
 -- We can use the following functions from lecture 2, to generate list of integers between 1 and n
 getRandomInt :: Int -> IO Int
 getRandomInt n = getStdRandom (randomR (1,n))
@@ -124,8 +130,8 @@ isdsj _                = True
 
 -- 3.2) main function to check whether a statement is in cnf form
 iscnf :: Form -> Bool
-iscnf (Cnj frms)       = all iscnf frms
-iscnf (Dsj (frm:frms)) = (iscnf (Dsj frms)) && (isdsj frm)
+iscnf (Cnj frms)       = and [iscnf frm | frm <- frms]
+iscnf (Dsj (frm:frms)) = (iscnf (Dsj frms))
 iscnf _                = True
 
 
@@ -142,10 +148,10 @@ testIter n p [] = print (show n ++ " tests passed...")
 testIter n p (fi:fis) = 
                         if p (convert2CNF fi) then
                          do
-                          print ("test passed on:" ++ show fi)
+                          print ("test passed on:" ++ show (convert2CNF fi))
                           testIter n p fis
                         else
-                          error ("test failed on:" ++ show fi)
+                          error ("test failed on:" ++ show (convert2CNF fi))
 
 testForms :: Int -> Int -> (Form -> Bool)-> IO()
 testForms n l p = do 
@@ -153,8 +159,8 @@ testForms n l p = do
                       testIter n p forms
 
 -- We can now generate 100 forms (n) with a certain level, convert them all to CNF and check whether testCNF property holds for all!!
-test100Form:: Int -> IO()
-test100Form level = testForms 100 level testCNF
+test100Form:: Int -> (Form ->  Bool) -> IO()
+test100Form level p = testForms 100 level p
 
 {- Report: 
    Using similar form generator to the one implemented in exercise 2,
@@ -171,4 +177,132 @@ test100Form level = testForms 100 level testCNF
    
    If test100Form passed successfully, that means we've succeeded to test the property against 300 forms.
    
+   You can execute the following main, to check the report because it is too long to be added to the report.
+   
+-}
+
+main = do
+          print "Testing properties...."
+          test100Form 0 hasNoArrows;
+          test100Form 1 hasNoArrows;
+          test100Form 2 hasNoArrows;
+         
+          test100Form 0 isnnf;
+          test100Form 1 isnnf;
+          test100Form 2 isnnf;
+
+          test100Form 0 iscnf;
+          test100Form 1 iscnf;
+          test100Form 2 iscnf;
+
+
+          test100Form 0 testCNF;
+          test100Form 1 testCNF;
+          test100Form 2 testCNF;
+
+{- last command result:
+
+test100Form 2 testCNF
+"test passed on:*(3 +(+(*(3 5) *(-3 -5)) 10 4 -1 +(-7 9) *(5 7 9 4 1 8 6 3 3 9) +(-3 2)))"
+"test passed on:*(*(*(7 3) +(*(-7 -3))) *(7 +(10 8 8 9 3 1 5 10)) *(-9 +(8)) *(7 +(2 3 8 6 1 10 1)) *(8) -7)"
+"test passed on:*(*(9 3) +(*(-9 -3)))"
+"test passed on:*(*(2 +(4 4 9 6 10 8)) +(*(2 4 8 5 4) 4 +(*(3 5) *(-3 -5)) +(-6 8) -5 +(-10 6) +(*(10 4) *(-10 -4))))"
+"test passed on:6"
+"test passed on:*(*(4 *(7 4 8)) +(*(-4 +(-7 -4 -8))))"
+"test passed on:*(*(*(-7 +(1)) *(-4 +(6))) +(*(*(7 -1) *(4 -6))))"
+"test passed on:*(*(2 10 6 3 4 4 5 10 4) *(-2 +(9)) 2 4)"
+"test passed on:8"
+"test passed on:*(-10 *(1 +(5 5 5 4 1 4 10)) *(8 +(5 1 4 8 5 4)))"
+"test passed on:*(-2 *(9 +(2 7 1 1 4 7 4)))"
+"test passed on:*(4 -7)"
+"test passed on:*(*(9 +(7 7 1 5 5)) -2 3)"
+"test passed on:*(-8 +(-6 +(5 2 8 2) *(10 10 10 10 6 7 1 4)))"
+"test passed on:1"
+"test passed on:*(*(*(*(10 9) +(*(-10 -9))) *(-3 +(9))) +(*(*(+(-10 -9) +(10 9)) *(3 -9))))"
+"test passed on:*(3 +(-4))"
+"test passed on:9"
+"test passed on:*(*(3 8 10 1 3) -1 4 *(*(10 10) +(*(-10 -10))) 5 *(*(1 9) +(*(-1 -9))) 1 *(1 3) -8 -9)"
+"test passed on:-7"
+"test passed on:*(*(*(8 7 3 4 8) 4) +(*(+(-8 -7 -3 -4 -8) -4)))"
+"test passed on:*(-8 -8 -7 -1 -1 -1)"
+"test passed on:8"
+"test passed on:5"
+"test passed on:*(*(9 +(4 10 9 8 1 4 9 9 9)) +(+(*(3 9) *(-3 -9)) +(4 10)))"
+"test passed on:*(*(-3 +(1)) -7 *(*(1 8) +(*(-1 -8))) -6 *(-8 +(5)) *(3 +(8 9)) *(*(6 1) +(*(-6 -1))) -5 *(2 7 6 7 4) *(-6 +(3)))"
+"test passed on:*(*(-8 +(2)) *(3 7 3 10) -6 *(-2 +(5)) *(*(7 2) +(*(-7 -2))))"
+"test passed on:5"
+"test passed on:*(-4 +(-6))"
+"test passed on:*(-9 -6 -4 -8 -1 -1 -9 -7 -1)"
+"test passed on:*(-10 +(+(9 8 8 1 1)))"
+"test passed on:*(-6 +(*(3 5 7 3 6 3 9 10) +(-3 8) +(*(6 6) *(-6 -6)) +(*(6 6) *(-6 -6)) *(4 4 1)))"
+"test passed on:*(-2 +(+(9)))"
+"test passed on:*(*(*(-1 +(-7)) *(1 +(7))) +(-9))"
+"test passed on:*(-2 -4)"
+"test passed on:*(-8 +(-3 -10 -9 -8 -7 -1 -5 -5))"
+"test passed on:*(1 -7)"
+"test passed on:*(*(-2 *(*(1 6) +(*(-1 -6)))) +(*(2 *(+(-1 -6) +(1 6)))))"
+"test passed on:-1"
+"test passed on:*(*(-5 +(-6)) *(5 +(6)))"
+"test passed on:*(*(-6 -7 -6 -6 -4 -4) +(*(8 9 8 4)))"
+"test passed on:*(*(2 *(8 9 4 1 4 3 5 1 9)) +(*(-2 +(-8 -9 -4 -1 -4 -3 -5 -1 -9))))"
+"test passed on:*(*(*(9 3 1 5) *(7 +(5))) +(*(+(-9 -3 -1 -5) *(-7 -5))))"
+"test passed on:*(8 +(+(*(3 1) *(-3 -1)) *(2 4 1 4) +(-5 7) 1 +(*(7 10) *(-7 -10)) +(10 10 9 8 3 8) 9 +(-7 10)))"
+"test passed on:*(*(-1 +(10)) +(+(*(8 3) *(-8 -3)) 9 -6 +(3 8 1 10 6 3 9 6)))"
+"test passed on:*(8 +(-2 *(4 2 3 3 10 1 1 5 5 6) +(10) +(*(8 4) *(-8 -4)) +(*(1 10) *(-1 -10)) *(8 2 1 8 10)))"
+"test passed on:*(*(-6 +(-5 -9 -10 -5 -9 -9 -3 -4 -5)) +(*(3 3 3)))"
+"test passed on:*(-4 +(-1 -1 -4 -7 -2 -4 -4))"
+"test passed on:*(*(2 -3) +(*(-2 3)))"
+"test passed on:-5"
+"test passed on:*(-8 +(+(-5 2)))"
+"test passed on:6"
+"test passed on:10"
+"test passed on:*(*(-3 +(3)) 9 *(1 +(7 6 5 4 6 5 5 7 4)) -3 *(-7 +(9)))"
+"test passed on:*(*(-2 +(1)))"
+"test passed on:*(*(*(7 4) +(*(-7 -4))) *(*(5 6) +(*(-5 -6))) *(10 3) 10 *(-2 +(9)) *(5 +(8 8 2)) 4 2 *(-6 +(3)) *(8 2 8 9 9 9 6 6 7))"
+"test passed on:*(*(10 3) +(*(-10 -3)))"
+"test passed on:*(8 +(+(-5 10)))"
+"test passed on:*(2 +(*(7 6)))"
+"test passed on:*(*(*(8 2) +(*(-8 -2))) *(3) *(-10 +(4)) *(*(1 3) +(*(-1 -3))) *(-5 +(6)) *(7 9 5 7 7 2 10) *(7 +(7 3 5 4)) *(-5 +(4)) *(*(6 2) +(*(-6 -2))) *(-3 +(5)))"
+"test passed on:*(*(*(*(1 8) +(*(-1 -8))) *(7 10 3 1 10 1 7 7)) +(*(*(+(-1 -8) +(1 8)) +(-7 -10 -3 -1 -10 -1 -7 -7))))"
+"test passed on:*(*(9 +(1 1 6)) +(1 -6 10 +(*(9 10) *(-9 -10)) -8 *(2) -1 +(*(9 1) *(-9 -1))))"
+"test passed on:*(*(*(5 2 5) *(*(7 8) +(*(-7 -8)))) +(*(+(-5 -2 -5) *(+(-7 -8) +(7 8)))))"
+"test passed on:*(4 -6)"
+"test passed on:*(*(-1 +(1)) *(9 +(1 8)))"
+"test passed on:-5"
+"test passed on:*(-2 +(*(10) *(5 9 7 10 9 9 5 5 6) +(6 5 10 10 5 2 10) +(5 6 7 10 8) -5 *(9 5 3 5) 8))"
+"test passed on:*(10)"
+"test passed on:*(*(*(*(2 7) +(*(-2 -7))) *(-2 +(6))) +(*(*(+(-2 -7) +(2 7)) *(2 -6))))"
+"test passed on:*(*(3 1 6 9 10) *(-1 +(1)))"
+"test passed on:*(*(*(-8 +(3)) *(*(3 8) +(*(-3 -8)))) +(*(*(8 -3) *(+(-3 -8) +(3 8)))))"
+"test passed on:*(*(*(-5 +(-7)) *(5 +(7))) +(*(5 1 9 10)))"
+"test passed on:-9"
+"test passed on:4"
+"test passed on:*(*(*(9 6) +(*(-9 -6))) +(+(*(1 2) *(-1 -2)) *(8 2 1 9 3)))"
+"test passed on:*(*(*(*(10 6) +(*(-10 -6))) -3) +(*(*(+(-10 -6) +(10 6)) 3)))"
+"test passed on:*(-10 +(+(*(8 5) *(-8 -5))))"
+"test passed on:*(*(3 8 7 6 6))"
+"test passed on:*(-9 +(3 +(-9 10) +(8 10 10 6 4 8)))"
+"test passed on:*(*(*(9 +(7 7 10 8 1 4 9)) 5) +(*(*(-9 -7 -7 -10 -8 -1 -4 -9) -5)))"
+"test passed on:*(*(-3 +(6)) +(+(-9 6)))"
+"test passed on:8"
+"test passed on:*(*(*(6 +(3 3 2 5 9)) *(*(1 3) +(*(-1 -3)))) +(*(*(-6 -3 -3 -2 -5 -9) *(+(-1 -3) +(1 3)))))"
+"test passed on:*(*(1 7 10 3 8 10 5) 2 -4 *(*(10 7) +(*(-10 -7))) 4 *(6 +(10 9)) *(1 2 5) *(4))"
+"test passed on:10"
+"test passed on:*(*(-3 -1 -9 -2) +(+(*(1 10) *(-1 -10))))"
+"test passed on:*(-7 +(-3 -8 -10 -8 -8 -2))"
+"test passed on:*(*(*(9 1) *(*(10 6) +(*(-10 -6)))) +(*(+(-9 -1) *(+(-10 -6) +(10 6)))))"
+"test passed on:2"
+"test passed on:*(-3 -3 -3 -10 -10 -6 -7 -9 -4)"
+"test passed on:*(*(-9 -4 -3 -1 -6) +(+(8)))"
+"test passed on:*(7 -3)"
+"test passed on:*(8 -10)"
+"test passed on:*(6 -9)"
+"test passed on:2"
+"test passed on:*(*(-3 +(10)) +(+(-9 1)))"
+"test passed on:6"
+"test passed on:*(6 -6)"
+"test passed on:4"
+"test passed on:6"
+"100 tests passed..."
+
 -}
