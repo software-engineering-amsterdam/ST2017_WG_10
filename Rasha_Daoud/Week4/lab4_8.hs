@@ -1,4 +1,4 @@
--- -time: 
+-- -time: 30 minutes
 module Lab4_8 where
 
 import Data.List
