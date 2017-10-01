@@ -1,3 +1,4 @@
+-- time 40 minutes:
 module Lab4_3 where
 
 import SetOrd
@@ -91,4 +92,3 @@ main = do
   +++ OK, passed 100 tests.
 -}
 
--- time spent: 30 min
