@@ -22,17 +22,67 @@ Deliverable: If your answer is that these are the same, you should give an argum
 isTrueArg :: Eq a => Ord a => (Rel a) -> Bool
 isTrueArg r = (symClos $ trClos r) == (trClos $ symClos r)
 
+{- 
+  *Lab4_8> isTrueArg [(0,0),(1,0)]
+  False
+  
+  Conclusion: the argument is not correct. Please consult Lab4_8.docx for the structured reporting.
+-}
 
-{- Please consult Lab4_8.docx for the structured reporting.
 
+{- we can also generate random relations and test the property on them as follows -}
+
+-- we need to a generator of relation [(a,a)] from a list of a [a]
+generateRelFromList :: Eq a => [a] -> Rel a
+generateRelFromList [] = []
+generateRelFromList [x] = []
+generateRelFromList [x,y] = [(x,y)]
+generateRelFromList (x:y:xs) = (x,y): generateRelFromList xs
+
+-- Now, we can n generate random relations [(Int, Int)]
+generateRel :: IO (Rel Int)
+generateRel =  do n <- getRandomInt 100
+                  k <- getRandomInt 20 -- can be 0, which means empty relation
+                  xs <- getIntL k n
+                  return $ nub $ generateRelFromList xs
+
+-- Next, let us generate n relations
+generateRels :: Int -> IO [Rel Int]
+generateRels 0 = return []
+generateRels n = do
+                  rel <- generateRel
+                  rels <- generateRels (n-1)
+                  return (rel:rels)
+
+-- Let's modify the testing function from last weeks to take relations & properties on relations as input
+testIter :: Int -> (Rel Int -> Bool) -> [Rel Int] -> IO()
+testIter n p [] = print (show n ++ " tests passed...")
+testIter n p (r:rs) = 
+                        if p r then
+                         do
+                          print ("test passed on:" ++ show r)
+                          testIter n p rs
+                        else
+                          error ("test failed on:" ++ show r)
+
+testRels :: Int -> (Rel Int -> Bool) -> IO()
+testRels n p = do 
+                      rels <- generateRels n
+                      testIter n p rels
+
+-- let's test any of the defined properties for 100 times, on relations generated with our generator 'generateRels'
+test100Rels :: (Rel Int -> Bool) -> IO()
+test100Rels p = testRels 100 p
+
+
+
+{-
+  
  *Lab4_8> test100Rels isTrueArg
  *** Exception: test failed on:[(0,0),(1,0)]
  CallStack (from HasCallStack):
   error, called at .\Lab4_7.hs:87:27 in main:Lab4_7
   
-  
- *Lab4_8> isTrueArg [(0,0),(1,0)]
- False
 
 A lot of other examples are found, but I've chosen the smallest example I've found. 
 
@@ -58,20 +108,29 @@ example3:
 
 main = do
          isTrueArg [(0,0),(1,0)];
-		 --isTrueArg [(0,0),(1,1),(1,0),(0,1),(-1,0),(-1,-1),(-1,1)];
-
-{- GHCi:
-     *Lab4_8> Lab4_8.main
-      False
--}
 
 
-{- Conclusion: the argument is not correct. However, as we can see from the examples in the attached report,
-
-  Let's prove that using the test generator from lab4_7.
-  We implement the property isTrueNewArg.
- -}
+{- However, we've noticed that another statement might be true. We implemented the following property: isTrueNewArg-}
  
 isTrueNewArg :: Eq a => Ord a => (Rel a) -> Bool
 isTrueNewArg r = (trClos $ symClos $ trClos r) == (trClos $ symClos r)
---You can execute command in GHCi as many times as you like: test100Rels isTrueNewArg;
+--You can execute command "test100Rels isTrueNewArg" to check correctness.
+
+
+
+-- helper functions from lecture2
+getRandomInt :: Int -> IO Int
+getRandomInt n = getStdRandom (randomR (0,n))
+
+randomFlip :: Int -> IO Int
+randomFlip x = do 
+   b <- getRandomInt 1
+   if b==0 then return x else return (-x)
+
+getIntL :: Int -> Int -> IO [Int]
+getIntL _ 0 = return []
+getIntL k n = do 
+   x <-  getRandomInt k
+   y <- randomFlip x
+   xs <- getIntL k (n-1)
+   return (y:xs)
