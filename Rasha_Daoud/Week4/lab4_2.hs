@@ -72,16 +72,15 @@ instance (Arbitrary a, Ord a) => Arbitrary (Set a) where
 
 -- We can now define three properties for the datatype Set a as follows:
 
---1)
+--1) self-explained
 testProp1 :: Set Int -> Bool
 testProp1 set@(Set xs) = set == list2set xs
 
---2)
+--2) a set has no duplicates
 testProp2 :: Set Int -> Bool
-testProp2 set@(Set (x:xs)) = not $ elem x xss
-                           where (Set xss) = deleteSet x set
+testProp2 (Set xs) =  xs == (nub xs)
 
---3)
+--3) droping all elements of the list of set, makes the set an empty set
 testProp3 :: Set Int -> Bool
 testProp3 (Set xs) = isEmpty $ list2set (drop (length xs) xs)
           
