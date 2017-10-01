@@ -17,7 +17,7 @@ Deliverable: If your answer is that these are the same, you should give an argum
 
 -}
 
--- Let's find out using the following property and the automated testing from lab4_7
+-- Let's find out using the following property and an automated testing
 
 isTrueArg :: Eq a => Ord a => (Rel a) -> Bool
 isTrueArg r = (symClos $ trClos r) == (trClos $ symClos r)
