@@ -56,6 +56,12 @@ testTrClos k n = do
                 else do
                     testTrClos (k+1) n
 
+
+testForQuickCheck:: (Rel Int) -> Bool
+testForQuickCheck r = isSymmetric (symClos r) && symClos r `isSuperSet` r && isSmallestPossible (symClos r) r isSymmetric &&
+                      isTransitive (trClos r) && trClos r `isSuperSet` r && isSmallestPossible (trClos r) r isTransitive
+
+
 main = do 
     testSymClos 0 100
     testTrClos  0 100
