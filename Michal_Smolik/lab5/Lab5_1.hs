@@ -1,4 +1,3 @@
-
 module Lab5_1
 
 where 
@@ -15,7 +14,21 @@ positions, values :: [Int]
 positions = [1..9]
 values    = [1..9] 
 
-blocks :: [[(Int,Int)]]
+
+
+{-
+modified methods: blocks
+                  bl
+                  subGrid
+                  sameBlock
+                  show methods
+I had to overhaul all of the methods that did something directly with the blocks to support
+overlapping ones.
+
+-}
+
+--list of lists, inner lists are lists of coordinates in single block
+blocks :: [[(Row, Column)]]
 blocks = [[(r,c) | r <- [1..3], c <- [1..3]],
           [(r,c) | r <- [1..3], c <- [4..6]],
           [(r,c) | r <- [1..3], c <- [7..9]],
@@ -112,9 +125,11 @@ grid2sud gr = \ (r,c) -> pos gr (r,c)
 showSudoku :: Sudoku -> IO()
 showSudoku = showGrid . sud2grid
 
+-- changed to return list of coords
 bl :: (Int,Int) -> [(Int, Int)]
 bl (x, y) = nub $ concat $ filter (elem (x,y)) blocks 
 
+--now just feeds bl different input
 subGrid :: Sudoku -> (Row,Column) -> [Value]
 subGrid s (r,c) = 
   nub [ s (r',c') | (r',c') <- bl (r,c) ]
@@ -195,6 +210,8 @@ prune (r,c,v) ((x,y,zs):rest)
         (x,y,zs\\[v]) : prune (r,c,v) rest
   | otherwise = (x,y,zs) : prune (r,c,v) rest
 
+
+--looks if they are at same list in `blocks`
 sameblock :: (Row,Column) -> (Row,Column) -> Bool
 sameblock (r,c) (x,y) = any (\b -> elem (r,c) b && elem (x,y) b) blocks
 
