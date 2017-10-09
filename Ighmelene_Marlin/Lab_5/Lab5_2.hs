@@ -51,7 +51,7 @@ sudoku    = nrc
 showMethod, showOriginal, showNrc :: Sudoku -> IO ()
 showOriginal  = showSudoku
 showNrc       = showSudokuNrc
-showMethod    = showSudokuNrc
+showMethod    = showNrc
 
 freeAtPos' :: Sudoku -> Position -> Constrnt -> [Value]
 freeAtPos' s (r,c) xs = 

@@ -86,6 +86,14 @@ import Lab5_2
 +---------+---------+---------+
 -}
 
+main55 :: IO ()
+main55 = do 
+          [r] <- rsolveNs' [emptyN]
+          showNode' r
+          putStrLn ""
+          s  <- genProblem' r
+          showNode' s
+
 rsuccNode' :: Node -> IO [Node]
 rsuccNode' (s,cs) = do 
                       xs <- getRandomCnstr cs
@@ -122,11 +130,4 @@ genProblem' n = do
                   ys <- randomize xs
                   return (minimalize' n ys)
                   where xs = filledPositions (fst n)
-
-main55 :: IO ()
-main55 = do 
-          [r] <- rsolveNs' [emptyN]
-          showNode' r
-          s  <- genProblem' r
-          showNode' s
 
