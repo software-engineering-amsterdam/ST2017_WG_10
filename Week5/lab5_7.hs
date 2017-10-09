@@ -4,7 +4,7 @@ where
 
 import Data.List
 import System.Random
-import Lecture5.hs
+import Lecture5
 
 {- Minimal problems for NRC Sudokus need fewer hints than standard Sudoku problems. Investigate the difference. What is the average number of hints in a minimal standard Sudoku problem? What is the average number of hints in a minimal NRC Sudoku problem? -}
 
