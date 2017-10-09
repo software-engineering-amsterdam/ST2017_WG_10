@@ -1,4 +1,4 @@
-
+-- time: 30 minutes
 module Lab5_3
 
 where 

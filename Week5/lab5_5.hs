@@ -1,3 +1,4 @@
+-- time: 60 minutes
 module Lab5_5
 
 where 
@@ -7,7 +8,6 @@ import System.Random
 import Lecture5
 import Lab5_2
 
--- 60 min
 {-
 *Lab5_5> main55
 +---------+---------+---------+

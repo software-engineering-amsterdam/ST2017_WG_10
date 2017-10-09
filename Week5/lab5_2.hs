@@ -1,3 +1,4 @@
+--time: 180 minutes 
 module Lab5_2
 
 where 
@@ -8,7 +9,7 @@ import Lecture5
 import Control.Exception
 import Data.Time
 
--- 180 min
+
 {-
 This second version is easier to extend for NRC problems because I just create an extra constraint and add it to the constraint collection for solving a basic sudoku problem.
 I join the rowConstrnt, columnConstrnt and blockConstrnt in one constraint: sudoku.
