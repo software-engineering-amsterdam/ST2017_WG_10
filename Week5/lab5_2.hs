@@ -11,17 +11,17 @@ import Data.Time
 
 
 {-
-This second version is easier to extend for NRC problems because I just create an extra constraint and add it to the constraint collection for solving a basic sudoku problem.
-I join the rowConstrnt, columnConstrnt and blockConstrnt in one constraint: sudoku.
+This second version is easier to extend for NRC problems, because we just create an extra constraint and add it to the constraint collection for solving a basic sudoku problem.
+We join the rowConstrnt, columnConstrnt and blockConstrnt in one constraint: sudoku.
 
-To modify for NRC sudoku I had to add the following methods:
+To modify for NRC sudoku we had to add the following methods:
   blocksNrc,
   nrcConstrnt.
 And modify the following methods:
   sudoku,
   showNode (to print NRC sudoku showing extra subgrids).
 
-But in the first version I had to add the following methods:
+But in the first version we had to add the following methods:
   blocksNrc,
   blNrc,
   subGridNrc,

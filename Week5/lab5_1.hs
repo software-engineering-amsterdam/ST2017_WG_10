@@ -1,3 +1,4 @@
+-- time: 90 minutes 
 module Lab5_1
 
 where 
@@ -6,7 +7,7 @@ import Data.List
 import System.Random
 import Lecture5
 
--- 90 min
+
 
 {-
 Example problem
