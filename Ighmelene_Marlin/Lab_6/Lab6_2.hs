@@ -2,11 +2,9 @@ module Lab6_2 where
 
 import Data.List
 import System.Random
-import Test.QuickCheck
-import Data.String.Utils
 import Lecture6
 
--- @ 300 min
+-- 300 min
 
 main62 :: IO ()
 main62 = do

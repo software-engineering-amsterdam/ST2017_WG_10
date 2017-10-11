@@ -1,8 +1,5 @@
 module Lab6_1 where
 
-import Data.List
-import System.Random
-
 -- 30 min
 exM' :: Integer -> Integer -> Integer -> Integer
 exM' x y z  
