@@ -7,6 +7,8 @@ import Lecture6
 -- 60 min
 
 {-
+The Miller-Rabin primality check correctly identifies all Carmichael numbers as composites
+
 *Lab6_6> main66 
 Checking the first 5500 Carmichael numbers for false primes
 Each dot (.) represents an exposed composite
