@@ -9,6 +9,13 @@ main64 :: IO ()
 main64 = doMain64 0
 
 {-
+The least composite number that was able to fool the test was 25.
+The number of divisors that can cause p to appear as a Fermat prime differs per number.
+And when k increases and more numbers are generated, the chances of finding only numbers which expose p as a Fermat prime decreases.
+But because the larger numbers probably have more divisors (and more a's which return a false prime) they can pretend to be a prime longer (higher k)
+
+Further explanation/test report:
+
 In order to know which composites are false primes we can call falseFermatPrimes:
 
     *Lab6_4> falseFermatPrimes 
