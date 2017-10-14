@@ -1,4 +1,4 @@
-
+--time: 20 min
 module Lab5_3
 
 where 
@@ -14,7 +14,7 @@ isMinimal :: Sudoku -> Bool
 isMinimal s = (hasSingleSolution s) && (not $ any hasSingleSolution [eraseS s (i,j) |
                                                                     i <- [1..9], j <- [1..9],
                                                                     s (i,j) > 0 ])
-
+--shows coords of numbers that can be removed with problem still having a single solution
 canBeRemoved :: Sudoku -> [(Row, Column)]
 canBeRemoved s = [(i,j)| i<-[1..9], j<-[1..9], s(i, j) > 0, hasSingleSolution (eraseS s (i,j))]
 
@@ -31,7 +31,7 @@ testMin k n = do
                 showNode nd
                 error("")
 runTest = do
-      testMin 0 10
+      testMin 0 100
 
 {-
 *Lab5_3> runTest

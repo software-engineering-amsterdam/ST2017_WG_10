@@ -1,3 +1,4 @@
+--time: 3h (including familiarizing with `Lecture5` code)
 module Lab5_1
 
 where 
