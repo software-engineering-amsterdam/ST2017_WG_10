@@ -22,7 +22,7 @@ carmichaelTestIterMR 0 _ _ =  return True -- base case
 carmichaelTestIterMR n k (x:xs) = do
    checkResult <- primeMR k x
    if(checkResult) then do
-      return True
+      return False
    else do
         carmichaelTestIterMR (n-1) k xs -- n is number of test-iterations
 
