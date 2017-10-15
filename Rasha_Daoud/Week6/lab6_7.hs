@@ -43,7 +43,7 @@ main67 = do
   testMillerRabinOnMarsenneTest 1 1;
   print "Miller-Rabin with marsenne primes and k = 2";
   testMillerRabinOnMarsenneTest 1 2;
-  print "Miller-Rabin with marsenne primes and = 3";
+  print "Miller-Rabin with marsenne primes and k = 3";
   testMillerRabinOnMarsenneTest 1 3;
   print "Miller-Rabin with marsenne primes and k = 4";
   testMillerRabinOnMarsenneTest 1 4;
@@ -58,7 +58,7 @@ main67 = do
 *Lab6_7> main67
 "Miller-Rabin with marsenne primes and k = 1"
 "Miller-Rabin with marsenne primes and k = 2"
-"Miller-Rabin with marsenne primes and = 3"
+"Miller-Rabin with marsenne primes and k = 3"
 "Miller-Rabin with marsenne primes and k = 4"
 "Miller-Rabin with marsenne primes and k = 1000"
 "Miller-Rabin with marsenne primes and k = 2000"
