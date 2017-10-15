@@ -1,4 +1,4 @@
--- time: 
+-- time: 20 minutes
 -- marcenne numbers 
 module Lab6_7
 where
