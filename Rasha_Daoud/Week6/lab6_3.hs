@@ -13,7 +13,7 @@ import Lab6_2
 
 
 composites' :: [Integer]
-composites' = [ x | x <- [4..], not $ prime x]
+composites' = [ x | x <- [2..], not $ prime x] -- even though 2 & 3 do not count!
 
 {-
 *Lab6_3> composites' 

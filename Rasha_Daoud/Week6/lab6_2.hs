@@ -13,9 +13,9 @@ import Lab6_1
 genModList :: Int -> IO [(Integer,Integer,Integer)]
 genModList 0 = return []
 genModList n = do
- x <- getStdRandom (randomR (1,100000000))
- y <- getStdRandom (randomR (1,100000000))
- z <- getStdRandom (randomR (1,100000000))
+ x <- getStdRandom (randomR (1,10000000))
+ y <- getStdRandom (randomR (1,10000000))
+ z <- getStdRandom (randomR (1,10000000))
  xs <- genModList (n-1)
  return ((x,y,z):xs)
 
@@ -32,7 +32,7 @@ randomTesterNew ((x,y,z):xs) = do
                 randomTesterNew xs
 
 -- random samples list
-ys = genModList 100000
+ys = genModList 1000000
 
 executeOrig :: IO ()
 executeOrig = do
@@ -59,21 +59,23 @@ giveSameRes = do
    xs <- ys;
    check xs;
 
-{- The conclusion is that, old implementation is a bit less efficient. Especially when taking big sample of data
+{- The conclusion is that, old implementation is less efficient. Especially when taking big sample of data
 and use big random integers in the tuple (e.g. generating numbers between 1 million and 1 billion, or 1 and 1 billion).
 
 The test was done on 1 million samples, each sample contains random numbers generated between 1 and 10 million.
 
 To set a timer, we used the following command in GHCi: :set +s
 
-*Lab6_2> executeOrig
-Original function
-"done"
-(4.79 secs, 4,592,908,528 bytes)
+ys = genModList 1000 (changing this number from 1 up to 1 billion, will show that the new implementation is way faster)
+
 *Lab6_2> executeNew
 New function
 "done"
-(4.70 secs, 4,592,900,776 bytes)
+(2.84 secs, 4,592,908,456 bytes)
+*Lab6_2> executeOrig
+Original function
+"done"
+(7.95 secs, 4,592,909,088 bytes)
 
 
 *Lab6_2> giveSameRes

@@ -10,9 +10,10 @@ import Lecture6
 exM' :: Integer -> Integer -> Integer -> Integer
 exM' _ 0 _ = 1
 exM' x 1 z = mod x z
-exM' x y z  | even y = multM exm exm z 
-            | otherwise = multM x (multM exm exm z) z
-           where  exm  = exM' x (div y 2) z
+exM' x y z  | even y = multM exm1 exm1 z
+            | otherwise = multM x (multM exm2 exm2 z) z
+           where  exm1  = exM' (x^2) (div y 2) z;
+                  exm2  = exM' (x^2) (div (pred y) 2) z;
 
 main61 = do
           print ("exM' 10 5 6 = " ++ show (exM' 10 5 6));
@@ -32,3 +33,12 @@ main61 = do
 "expM 4 13 497 = 445"
 
 -}
+
+{- Another way to implement the function with an efficient way as well is as follows: -}
+
+exM'' :: Integer -> Integer -> Integer -> Integer
+exM'' _ 0 _ = 1
+exM'' x 1 z = mod x z
+exM'' x y z  | even y = multM exm exm z 
+            | otherwise = multM x (multM exm exm z) z
+           where  exm  = exM'' x (div y 2) z
